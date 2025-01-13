@@ -8,12 +8,17 @@ const chatBox = document.getElementById('chatBox');
 const coinCount = document.getElementById('coinCount');
 let messages = JSON.parse(localStorage.getItem('messages')) || [];
 
-// Adding function to handle coin accumulation every 20 seconds
 setInterval(() => {
   users[currentUser].coins += 2;
   localStorage.setItem('users', JSON.stringify(users));
   updateCoins();
 }, 20000);
+
+// تحديث الرسائل من localStorage بشكل دوري
+setInterval(() => {
+  messages = JSON.parse(localStorage.getItem('messages')) || [];
+  renderMessages();
+}, 1000);
 
 function updateCoins() {
   coinCount.textContent = `Coins: ${users[currentUser].coins}`;
