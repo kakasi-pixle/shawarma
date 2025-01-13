@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -8,18 +9,14 @@
 </head>
 <body>
   <div class="header">
-    <!-- Added button to toggle chat and coin display -->
-    <button class="icon-btn" onclick="toggleMenu()">
-      <span>=</span>
+    <button class="icon-btn" onclick="showInfo()">
+      <img src="computer-icon.png" alt="Computer Icon">
     </button>
     <div class="coins">
       <span id="coinCount">Coins: 0</span>
     </div>
   </div>
-  <div id="menu" class="menu">
-    <div class="coins">
-      <span id="coinCount">Coins: 0</span>
-    </div>
+  <div class="chat-container">
     <div id="chatBox" class="chat-box"></div>
     <div class="chat-input">
       <input type="text" id="messageInput" placeholder="Type your message...">
@@ -28,5 +25,14 @@
     </div>
   </div>
   <script src="chat.js"></script>
+
+<section id="game-area" class="game-area">
+    <h2>منطقة الألعاب</h2>
+    <p>قم بتجميع العملات الذهبية! ستحصل على عملة واحدة كل 20 ثانية.</p>
+    <button id="collect-coins" onclick="collectCoins()">تجميع العملات</button>
+    <p id="coin-count">رصيدك: 0 عملة</p>
+    <div id="win-animation" style="display: none;">🎉💰 عملة ذهبية 💰🎉</div>
+</section>
+
 </body>
 </html>

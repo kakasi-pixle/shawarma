@@ -42,3 +42,20 @@ function register() {
   alert('Registration successful! You can now log in.');
   showLogin();
 }
+
+let coinCount = 0;
+
+// Function to collect coins
+function collectCoins() {
+    coinCount++;
+    document.getElementById('coin-count').textContent = `رصيدك: ${coinCount} عملة`;
+}
+
+// Function to show win animation
+function showWinAnimation() {
+    const animation = document.getElementById('win-animation');
+    animation.style.display = 'block';
+    setTimeout(() => {
+        animation.style.display = 'none';
+    }, 1000);
+}
