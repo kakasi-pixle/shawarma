@@ -23,6 +23,14 @@ body {
   padding: 5px;
 }
 
+/* تغيير الزر على الهواتف */
+@media (max-width: 768px) {
+  .icon-btn {
+    font-size: 40px;
+    color: #ff8c00;
+  }
+}
+
 .menu {
   position: fixed;
   top: 0;
