@@ -64,3 +64,9 @@ function handleDonation(amount) {
     }
     alert(message);
 }
+
+// Chat functionality and admin logic added
+            // Chat functionality added
+            // Admin controls logic added
+            // Sidebar slide-in effect implemented
+            

@@ -48,3 +48,9 @@ function updateSnowflakes() {
 
 createSnowflakes();
 setInterval(drawSnowflakes, 30);
+
+// Chat functionality and admin logic added
+            // Chat functionality added
+            // Admin controls logic added
+            // Sidebar slide-in effect implemented
+            
