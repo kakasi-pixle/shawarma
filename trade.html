@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>نظام تريد</title>
+  <link rel="stylesheet" href="dashboard-styles.css">
+  <style>
+    .trade-form {
+      width: 300px;
+      margin: 20px auto;
+      padding: 20px;
+      border: 2px solid #ccc;
+      border-radius: 10px;
+      text-align: center;
+    }
+    .trade-form input, .trade-form select {
+      width: 90%;
+      padding: 10px;
+      margin: 5px 0;
+    }
+    .trade-form button {
+      padding: 10px 20px;
+      background: #007bff;
+      border: none;
+      border-radius: 5px;
+      color: white;
+      cursor: pointer;
+    }
+    .trade-requests {
+      width: 90%;
+      margin: 20px auto;
+    }
+    .trade-request {
+      border: 1px solid #ccc;
+      padding: 10px;
+      margin: 5px 0;
+    }
+  </style>
+</head>
+<body>
+  <h2 style="text-align: center;">نظام تريد</h2>
+  <div class="trade-form">
+    <h3>إنشاء طلب تريد</h3>
+    <input type="text" id="tradeRecipient" placeholder="اسم المستخدم المستهدف" required>
+    <input type="text" id="tradeOffer" placeholder="العنصر الذي تعرضه" required>
+    <input type="text" id="tradeRequest" placeholder="العنصر الذي تطلبه" required>
+    <button onclick="createTrade()">إرسال الطلب</button>
+  </div>
+
+  <div class="trade-requests">
+    <h3>طلبات التي تريد الحالية</h3>
+    <div id="tradeList"></div>
+  </div>
+
+  <script>
+    function createTrade() {
+      const recipient = document.getElementById('tradeRecipient').value.trim();
+      const offer = document.getElementById('tradeOffer').value.trim();
+      const request = document.getElementById('tradeRequest').value.trim();
+      const sender = localStorage.getItem('currentUser');
+
+      if (!sender) {
+        alert('يجب تسجيل الدخول!');
+        return;
+      }
+      if (!recipient || !offer || !request) {
+        alert('يرجى ملء جميع الحقول');
+        return;
+      }
+
+      let trades = JSON.parse(localStorage.getItem('tradeRequests')) || [];
+      trades.push({ sender, recipient, offer, request, time: new Date().toLocaleString() });
+      localStorage.setItem('tradeRequests', JSON.stringify(trades));
+      displayTrades();
+      alert('تم إرسال طلب التريد');
+    }
+
+    function displayTrades() {
+      const tradeList = document.getElementById('tradeList');
+      tradeList.innerHTML = '';
+      const trades = JSON.parse(localStorage.getItem('tradeRequests')) || [];
+      trades.forEach(trade => {
+        const div = document.createElement('div');
+        div.className = 'trade-request';
+        div.innerHTML = `<p><strong>المرسل:</strong> ${trade.sender}</p>
+                         <p><strong>المستقبل:</strong> ${trade.recipient}</p>
+                         <p><strong>يعرض:</strong> ${trade.offer}</p>
+                         <p><strong>يطلب:</strong> ${trade.request}</p>
+                         <p><small>${trade.time}</small></p>`;
+        tradeList.appendChild(div);
+      });
+    }
+
+    displayTrades();
+  </script>
+</body>
+</html>
