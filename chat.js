@@ -1,4 +1,3 @@
-
 const currentUser = localStorage.getItem('currentUser');
 if (!currentUser) {
   window.location.href = 'index.html';
@@ -38,6 +37,21 @@ function sendCoin() {
   }
 }
 
+function buyBot() {
+  const botCost = 10;
+  if (users[currentUser].coins >= botCost) {
+    users[currentUser].coins -= botCost;
+    users[currentUser].boughtBot = true;
+    localStorage.setItem('users', JSON.stringify(users));
+    messages.push({ sender: currentUser, text: '🤖 لقد اشتريت بوت رقم فيك!' });
+    localStorage.setItem('messages', JSON.stringify(messages));
+    updateCoins();
+    renderMessages();
+  } else {
+    alert('ليس لديك عملات كافية لشراء البوت!');
+  }
+}
+
 function renderMessages() {
   chatBox.innerHTML = '';
   messages.forEach(msg => {
@@ -52,21 +66,19 @@ renderMessages();
 
 // Handle donations and emoji effects
 function handleDonation(amount) {
-    let message = '';
-    if (amount === 5) {
-        message = '🎉 تأثير بسيط 🎉';
-    } else if (amount === 10) {
-        message = '🎊 تأثير متوسط 🎊';
-    } else if (amount === 20) {
-        message = '🎆 تأثير مميز 🎆';
-    } else if (amount === 30) {
-        message = '✨✨ أقوى تأثير ✨✨';
-    }
-    alert(message);
+  let message = '';
+  if (amount === 5) {
+      message = '🎉 تأثير بسيط 🎉';
+  } else if (amount === 10) {
+      message = '🎊 تأثير متوسط 🎊';
+  } else if (amount === 20) {
+      message = '🎆 تأثير مميز 🎆';
+  } else if (amount === 30) {
+      message = '✨✨ أقوى تأثير ✨✨';
+  }
+  alert(message);
 }
 
 // Chat functionality and admin logic added
-            // Chat functionality added
-            // Admin controls logic added
-            // Sidebar slide-in effect implemented
-            
+// Admin controls logic added
+// Sidebar slide-in effect implemented
