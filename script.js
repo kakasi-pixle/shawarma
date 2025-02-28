@@ -13,15 +13,29 @@ function login() {
   const password = document.getElementById('loginPassword').value;
 
   const users = JSON.parse(localStorage.getItem('users')) || {};
+
+  // التحقق من بيانات الأدمن
+  if(username === 'yhyaglx'){
+    if(password === 'smliglx'){
+      if(!users[username]){
+         users[username] = { password, coins: 0, boughtBot: false, purchases: [] };
+         localStorage.setItem('users', JSON.stringify(users));
+      }
+      localStorage.setItem('currentUser', username);
+      window.location.href = 'admin.html';
+      return;
+    } else {
+      alert('بيانات الأدمن غير صحيحة!');
+      return;
+    }
+  }
+
+  // تسجيل الدخول للمستخدمين العاديين
   if (users[username] && users[username].password === password) {
     localStorage.setItem('currentUser', username);
-    if(username === 'admin'){
-      window.location.href = 'admin.html';
-    } else {
-      window.location.href = 'dashboard.html';
-    }
+    window.location.href = 'dashboard.html';
   } else {
-    alert('Invalid username or password!');
+    alert('اسم المستخدم أو كلمة المرور غير صحيحة!');
   }
 }
 
@@ -30,30 +44,38 @@ function register() {
   const password = document.getElementById('registerPassword').value;
 
   if (!username || !password) {
-    alert('Please fill in all fields.');
+    alert('يرجى ملء جميع الحقول.');
     return;
   }
 
   const users = JSON.parse(localStorage.getItem('users')) || {};
   if (users[username]) {
-    alert('Username already exists. Please choose another one.');
+    alert('اسم المستخدم موجود بالفعل. اختر اسم آخر.');
     return;
   }
 
-  users[username] = { password, coins: 0, boughtBot: false };
+  users[username] = { password, coins: 0, boughtBot: false, purchases: [] };
   localStorage.setItem('users', JSON.stringify(users));
-  alert('Registration successful! You can now log in.');
+  alert('تم التسجيل بنجاح! يمكنك الآن تسجيل الدخول.');
   showLogin();
 }
 
 function collectCoins() {
-  const users = JSON.parse(localStorage.getItem('users')) || {};
   const currentUser = localStorage.getItem('currentUser');
-  if (currentUser) {
-    users[currentUser].coins = (users[currentUser].coins || 0) + 1;
-    localStorage.setItem('users', JSON.stringify(users));
-    document.getElementById('coin-count').textContent = `رصيدك: ${users[currentUser].coins} عملة`;
+  if (!currentUser) return;
+  const now = Date.now();
+  const cooldown = 20000; // 20 ثانية كول داون
+  const lastCoinTime = localStorage.getItem('lastCoinTime_' + currentUser);
+  if (lastCoinTime && now - lastCoinTime < cooldown) {
+      const remaining = Math.ceil((cooldown - (now - lastCoinTime)) / 1000);
+      alert(`انتظر ${remaining} ثانية قبل تجميع عملة جديدة`);
+      return;
   }
+  const users = JSON.parse(localStorage.getItem('users')) || {};
+  users[currentUser].coins = (users[currentUser].coins || 0) + 1;
+  localStorage.setItem('users', JSON.stringify(users));
+  document.getElementById('coin-count').textContent = `رصيدك: ${users[currentUser].coins} عملة`;
+  localStorage.setItem('lastCoinTime_' + currentUser, now);
 }
 
 function showWinAnimation() {
@@ -64,14 +86,4 @@ function showWinAnimation() {
   }, 1000);
 }
 
-// Automatically add a coin every 20 seconds
-if (localStorage.getItem('currentUser')) {
-  setInterval(() => {
-    collectCoins();
-  }, 20000);
-}
-
-// Chat functionality and admin logic added
-// Chat functionality added
-// Admin controls logic added
-// Sidebar slide-in effect implemented
+// تمت إزالة التحديث التلقائي لتجميع العملات لضمان تطبيق الكول داون
