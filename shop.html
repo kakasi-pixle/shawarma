@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>المتجر</title>
+  <link rel="stylesheet" href="dashboard-styles.css">
+</head>
+<body>
+  <h2 style="text-align: center;">المتجر</h2>
+  <div style="text-align: center;">
+    <button onclick="buyBot()" class="new-btn">شراء بوت رقم فيك (10 عملات)</button>
+  </div>
+  <script>
+    function buyBot() {
+      const users = JSON.parse(localStorage.getItem('users')) || {};
+      const currentUser = localStorage.getItem('currentUser');
+      if (!currentUser) {
+          alert('يجب تسجيل الدخول أولاً!');
+          return;
+      }
+      const user = users[currentUser];
+      const botCost = 10;
+      if(user.coins >= botCost) {
+          user.coins -= botCost;
+          user.boughtBot = true;
+          localStorage.setItem('users', JSON.stringify(users));
+          alert('تم شراء بوت رقم فيك بنجاح!');
+      } else {
+          alert('ليس لديك عملات كافية!');
+      }
+    }
+  </script>
+</body>
+</html>
