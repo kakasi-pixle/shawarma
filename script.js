@@ -1,4 +1,3 @@
-
 function showLogin() {
   document.getElementById('registerForm').style.display = 'none';
   document.getElementById('loginForm').style.display = 'block';
@@ -16,7 +15,11 @@ function login() {
   const users = JSON.parse(localStorage.getItem('users')) || {};
   if (users[username] && users[username].password === password) {
     localStorage.setItem('currentUser', username);
-    window.location.href = 'dashboard.html';
+    if(username === 'admin'){
+      window.location.href = 'admin.html';
+    } else {
+      window.location.href = 'dashboard.html';
+    }
   } else {
     alert('Invalid username or password!');
   }
@@ -37,31 +40,38 @@ function register() {
     return;
   }
 
-  users[username] = { password, coins: 0 };
+  users[username] = { password, coins: 0, boughtBot: false };
   localStorage.setItem('users', JSON.stringify(users));
   alert('Registration successful! You can now log in.');
   showLogin();
 }
 
-let coinCount = 0;
-
-// Function to collect coins
 function collectCoins() {
-    coinCount++;
-    document.getElementById('coin-count').textContent = `رصيدك: ${coinCount} عملة`;
+  const users = JSON.parse(localStorage.getItem('users')) || {};
+  const currentUser = localStorage.getItem('currentUser');
+  if (currentUser) {
+    users[currentUser].coins = (users[currentUser].coins || 0) + 1;
+    localStorage.setItem('users', JSON.stringify(users));
+    document.getElementById('coin-count').textContent = `رصيدك: ${users[currentUser].coins} عملة`;
+  }
 }
 
-// Function to show win animation
 function showWinAnimation() {
-    const animation = document.getElementById('win-animation');
-    animation.style.display = 'block';
-    setTimeout(() => {
-        animation.style.display = 'none';
-    }, 1000);
+  const animation = document.getElementById('win-animation');
+  animation.style.display = 'block';
+  setTimeout(() => {
+    animation.style.display = 'none';
+  }, 1000);
+}
+
+// Automatically add a coin every 20 seconds
+if (localStorage.getItem('currentUser')) {
+  setInterval(() => {
+    collectCoins();
+  }, 20000);
 }
 
 // Chat functionality and admin logic added
-            // Chat functionality added
-            // Admin controls logic added
-            // Sidebar slide-in effect implemented
-            
+// Chat functionality added
+// Admin controls logic added
+// Sidebar slide-in effect implemented
