@@ -12,10 +12,14 @@
       padding: 10px;
       border: 1px solid #ccc;
       border-radius: 5px;
+      text-align: center;
     }
     .item img {
       width: 100px;
       height: 100px;
+    }
+    .rarity {
+      font-weight: bold;
     }
   </style>
 </head>
@@ -34,21 +38,34 @@
       items.forEach((item, index) => {
         const div = document.createElement('div');
         div.className = 'item';
-        div.innerHTML = `<img src="${item.image}" alt="${item.name}"><p>${item.name}</p>`;
+        div.innerHTML = `<img src="${item.image}" alt="${item.name}"><p>${item.name}</p><p class="rarity">${item.rarity}</p>`;
         itemsContainer.appendChild(div);
       });
     }
 
     function collectItem() {
-      // Array of sample items
+      const currentUser = localStorage.getItem('currentUser');
+      if (!currentUser) {
+        alert('يجب تسجيل الدخول!');
+        return;
+      }
+      const now = Date.now();
+      const cooldown = 30000; // 30 ثانية كول داون لتجميع الأيتيمات
+      const lastItemTime = localStorage.getItem('lastItemTime_' + currentUser);
+      if (lastItemTime && now - lastItemTime < cooldown) {
+        const remaining = Math.ceil((cooldown - (now - lastItemTime)) / 1000);
+        alert(`انتظر ${remaining} ثانية قبل تجميع أيتم جديد`);
+        return;
+      }
       const sampleItems = [
-        { name: 'درع', image: 'https://via.placeholder.com/100?text=درع' },
-        { name: 'سيف', image: 'https://via.placeholder.com/100?text=سيف' },
-        { name: 'خاتم', image: 'https://via.placeholder.com/100?text=خاتم' }
+        { name: 'درع', image: 'https://via.placeholder.com/100?text=درع', rarity: 'عاديه' },
+        { name: 'سيف', image: 'https://via.placeholder.com/100?text=سيف', rarity: 'نادره' },
+        { name: 'خاتم', image: 'https://via.placeholder.com/100?text=خاتم', rarity: 'اسطوريه' }
       ];
       const randomItem = sampleItems[Math.floor(Math.random() * sampleItems.length)];
       items.push(randomItem);
       localStorage.setItem('items', JSON.stringify(items));
+      localStorage.setItem('lastItemTime_' + currentUser, now);
       displayItems();
     }
 
