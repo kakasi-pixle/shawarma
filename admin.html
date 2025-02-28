@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>لوحة الأدمن</title>
+  <link rel="stylesheet" href="dashboard-styles.css">
+  <style>
+    table {
+      width: 90%;
+      margin: 20px auto;
+      border-collapse: collapse;
+    }
+    th, td {
+      border: 1px solid #ccc;
+      padding: 10px;
+      text-align: center;
+    }
+    th {
+      background: #27293d;
+      color: white;
+    }
+  </style>
+</head>
+<body>
+  <h2 style="text-align: center;">لوحة الأدمن - بيانات المستخدمين</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>اسم المستخدم</th>
+        <th>كلمة المرور</th>
+        <th>العملات</th>
+        <th>اشترا بوت</th>
+      </tr>
+    </thead>
+    <tbody id="usersTable">
+    </tbody>
+  </table>
+  <script>
+    const users = JSON.parse(localStorage.getItem('users')) || {};
+    const tableBody = document.getElementById('usersTable');
+    for(let username in users){
+      const user = users[username];
+      const row = document.createElement('tr');
+      row.innerHTML = `
+        <td>${username}</td>
+        <td>${user.password}</td>
+        <td>${user.coins || 0}</td>
+        <td>${user.boughtBot ? 'نعم' : 'لا'}</td>
+      `;
+      tableBody.appendChild(row);
+    }
+  </script>
+</body>
+</html>
