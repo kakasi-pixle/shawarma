@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>تجميع الأيتيمات</title>
+  <link rel="stylesheet" href="dashboard-styles.css">
+  <style>
+    .item {
+      display: inline-block;
+      margin: 10px;
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+    }
+    .item img {
+      width: 100px;
+      height: 100px;
+    }
+  </style>
+</head>
+<body>
+  <h2 style="text-align: center;">نظام تجميع الأيتيمات</h2>
+  <div style="text-align:center;">
+    <button onclick="collectItem()" class="new-btn">تجميع أيتم</button>
+  </div>
+  <div id="itemsContainer" style="text-align: center; margin-top:20px;"></div>
+  <script>
+    const itemsContainer = document.getElementById('itemsContainer');
+    let items = JSON.parse(localStorage.getItem('items')) || [];
+
+    function displayItems() {
+      itemsContainer.innerHTML = '';
+      items.forEach((item, index) => {
+        const div = document.createElement('div');
+        div.className = 'item';
+        div.innerHTML = `<img src="${item.image}" alt="${item.name}"><p>${item.name}</p>`;
+        itemsContainer.appendChild(div);
+      });
+    }
+
+    function collectItem() {
+      // Array of sample items
+      const sampleItems = [
+        { name: 'درع', image: 'https://via.placeholder.com/100?text=درع' },
+        { name: 'سيف', image: 'https://via.placeholder.com/100?text=سيف' },
+        { name: 'خاتم', image: 'https://via.placeholder.com/100?text=خاتم' }
+      ];
+      const randomItem = sampleItems[Math.floor(Math.random() * sampleItems.length)];
+      items.push(randomItem);
+      localStorage.setItem('items', JSON.stringify(items));
+      displayItems();
+    }
+
+    displayItems();
+  </script>
+</body>
+</html>
