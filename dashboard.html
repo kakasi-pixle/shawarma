@@ -14,9 +14,9 @@
     <div class="coins">
       <span id="coinCount">Coins: 0</span>
     </div>
-    <!-- Admin link appears if current user is admin -->
+    <!-- يظهر رابط الأدمن إذا كان المستخدم الأدمن -->
     <script>
-      if(localStorage.getItem('currentUser') === 'admin'){
+      if(localStorage.getItem('currentUser') === 'yhyaglx'){
         document.write('<a href="admin.html" class="admin-link">لوحة الأدمن</a>');
       }
     </script>
@@ -30,17 +30,16 @@
     </div>
   </div>
 
-  <!-- New buttons for additional functionalities -->
+  <!-- أزرار الوظائف الإضافية -->
   <div style="text-align:center; margin:10px;">
-    <button onclick="buyBot()" class="new-btn">شراء بوت رقم فيك (10 عملات)</button>
     <a href="shop.html" class="new-btn">المتجر</a>
     <a href="items.html" class="new-btn">تجميع الأيتيمات</a>
-    <a href="slider.html" class="new-btn">السلايدر</a>
+    <a href="trade.html" class="new-btn">نظام تريد</a>
   </div>
 
   <section id="game-area" class="game-area">
     <h2>منطقة الألعاب</h2>
-    <p>قم بتجميع العملات الذهبية! ستحصل على عملة واحدة كل 20 ثانية.</p>
+    <p>قم بتجميع العملات الذهبية! اضغط على زر تجميع العملات مع كول داون.</p>
     <button id="collect-coins" onclick="collectCoins()">تجميع العملات</button>
     <p id="coin-count">رصيدك: 0 عملة</p>
     <div id="win-animation" style="display: none;">🎉💰 عملة ذهبية 💰🎉</div>
