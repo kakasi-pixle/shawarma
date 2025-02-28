@@ -37,21 +37,6 @@ function sendCoin() {
   }
 }
 
-function buyBot() {
-  const botCost = 10;
-  if (users[currentUser].coins >= botCost) {
-    users[currentUser].coins -= botCost;
-    users[currentUser].boughtBot = true;
-    localStorage.setItem('users', JSON.stringify(users));
-    messages.push({ sender: currentUser, text: '🤖 لقد اشتريت بوت رقم فيك!' });
-    localStorage.setItem('messages', JSON.stringify(messages));
-    updateCoins();
-    renderMessages();
-  } else {
-    alert('ليس لديك عملات كافية لشراء البوت!');
-  }
-}
-
 function renderMessages() {
   chatBox.innerHTML = '';
   messages.forEach(msg => {
@@ -64,7 +49,7 @@ function renderMessages() {
 updateCoins();
 renderMessages();
 
-// Handle donations and emoji effects
+// Donations and emoji effects
 function handleDonation(amount) {
   let message = '';
   if (amount === 5) {
@@ -79,6 +64,4 @@ function handleDonation(amount) {
   alert(message);
 }
 
-// Chat functionality and admin logic added
-// Admin controls logic added
-// Sidebar slide-in effect implemented
+// تمت إزالة وظيفة شراء البوت من الشات حسب الطلب
