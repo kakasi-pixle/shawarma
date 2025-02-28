@@ -1,92 +1,52 @@
-body {
-  margin: 0;
-  font-family: Arial, sans-serif;
-  background: #1e1e2f;
-  color: white;
-  height: 100vh;
-  display: flex;
-  flex-direction: column;
-}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard</title>
+  <link rel="stylesheet" href="dashboard-styles.css">
+</head>
+<body>
+  <div class="header">
+    <button class="icon-btn" onclick="showInfo()">
+      <img src="computer-icon.png" alt="Computer Icon">
+    </button>
+    <div class="coins">
+      <span id="coinCount">Coins: 0</span>
+    </div>
+    <!-- Admin link appears if current user is admin -->
+    <script>
+      if(localStorage.getItem('currentUser') === 'admin'){
+        document.write('<a href="admin.html" class="admin-link">لوحة الأدمن</a>');
+      }
+    </script>
+  </div>
+  <div class="chat-container">
+    <div id="chatBox" class="chat-box"></div>
+    <div class="chat-input">
+      <input type="text" id="messageInput" placeholder="Type your message...">
+      <button onclick="sendMessage()">Send</button>
+      <button onclick="sendCoin()">Send Coin</button>
+    </div>
+  </div>
 
-.header {
-  background: #27293d;
-  padding: 10px;
-  text-align: right;
-}
+  <!-- New buttons for additional functionalities -->
+  <div style="text-align:center; margin:10px;">
+    <button onclick="buyBot()" class="new-btn">شراء بوت رقم فيك (10 عملات)</button>
+    <a href="shop.html" class="new-btn">المتجر</a>
+    <a href="items.html" class="new-btn">تجميع الأيتيمات</a>
+    <a href="slider.html" class="new-btn">السلايدر</a>
+  </div>
 
-.icon-btn {
-  background: none;
-  border: none;
-  cursor: pointer;
-}
+  <section id="game-area" class="game-area">
+    <h2>منطقة الألعاب</h2>
+    <p>قم بتجميع العملات الذهبية! ستحصل على عملة واحدة كل 20 ثانية.</p>
+    <button id="collect-coins" onclick="collectCoins()">تجميع العملات</button>
+    <p id="coin-count">رصيدك: 0 عملة</p>
+    <div id="win-animation" style="display: none;">🎉💰 عملة ذهبية 💰🎉</div>
+  </section>
 
-.icon-btn img {
-  width: 30px;
-}
-
-.chat-container {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-}
-
-.chat-box {
-  flex: 1;
-  padding: 10px;
-  overflow-y: auto;
-  border: 1px solid #444;
-  margin: 10px;
-  background: #333;
-}
-
-.chat-input {
-  display: flex;
-  padding: 10px;
-  background: #27293d;
-}
-
-.chat-input input {
-  flex: 1;
-  padding: 10px;
-  border: none;
-  border-radius: 5px;
-  margin-right: 10px;
-}
-
-.chat-input button {
-  padding: 10px 20px;
-  border: none;
-  border-radius: 5px;
-  background: #0066cc;
-  color: white;
-  cursor: pointer;
-}
-
-.chat-input button:hover {
-  background: #0055aa;
-}
-
-/* New theme styles added */
-/* New styles applied as per screenshots */
-
-/* New button styles */
-.new-btn {
-  padding: 10px 20px;
-  border: none;
-  border-radius: 5px;
-  background: #28a745;
-  color: white;
-  cursor: pointer;
-  margin: 5px;
-}
-
-.new-btn:hover {
-  background: #218838;
-}
-
-.admin-link {
-  color: #ffc107;
-  cursor: pointer;
-  margin-left: 10px;
-}
+  <script src="chat.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>
