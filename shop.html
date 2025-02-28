@@ -5,27 +5,76 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>المتجر</title>
   <link rel="stylesheet" href="dashboard-styles.css">
+  <style>
+    .shop-item {
+      display: inline-block;
+      margin: 20px;
+      padding: 20px;
+      border: 2px solid #ccc;
+      border-radius: 10px;
+      text-align: center;
+      width: 200px;
+    }
+    .shop-item img {
+      width: 150px;
+      height: 150px;
+    }
+    .shop-item button {
+      margin-top: 10px;
+      padding: 10px;
+      background: #28a745;
+      border: none;
+      border-radius: 5px;
+      color: white;
+      cursor: pointer;
+    }
+  </style>
 </head>
 <body>
   <h2 style="text-align: center;">المتجر</h2>
   <div style="text-align: center;">
-    <button onclick="buyBot()" class="new-btn">شراء بوت رقم فيك (10 عملات)</button>
+    <div class="shop-item">
+      <h3>بوت</h3>
+      <p>السعر: 50 عملة</p>
+      <p>الفئة: عادي</p>
+      <button onclick="buyItem('بوت', 50)">شراء</button>
+    </div>
+    <div class="shop-item">
+      <h3>بوت علي رقمك</h3>
+      <p>السعر: 2000 عملة</p>
+      <p>الفئة: نادر</p>
+      <button onclick="buyItem('بوت علي رقمك', 2000)">شراء</button>
+    </div>
+    <div class="shop-item">
+      <h3>رقم فيك</h3>
+      <p>السعر: 500 عملة</p>
+      <p>الفئة: اسطوري</p>
+      <button onclick="buyItem('رقم فيك', 500)">شراء</button>
+    </div>
+    <div class="shop-item">
+      <h3>موقع ليك</h3>
+      <p>السعر: 50000 عملة</p>
+      <p>الفئة: اسطوري</p>
+      <button onclick="buyItem('موقع ليك', 50000)">شراء</button>
+    </div>
   </div>
+
   <script>
-    function buyBot() {
+    function buyItem(itemName, cost) {
       const users = JSON.parse(localStorage.getItem('users')) || {};
       const currentUser = localStorage.getItem('currentUser');
       if (!currentUser) {
           alert('يجب تسجيل الدخول أولاً!');
           return;
       }
-      const user = users[currentUser];
-      const botCost = 10;
-      if(user.coins >= botCost) {
-          user.coins -= botCost;
-          user.boughtBot = true;
+      if(users[currentUser].coins >= cost){
+          users[currentUser].coins -= cost;
+          if(!users[currentUser].purchases){
+             users[currentUser].purchases = [];
+          }
+          users[currentUser].purchases.push({ name: itemName, boughtAt: new Date().toLocaleString() });
           localStorage.setItem('users', JSON.stringify(users));
-          alert('تم شراء بوت رقم فيك بنجاح!');
+          alert('تم شراء ' + itemName);
       } else {
           alert('ليس لديك عملات كافية!');
       }
