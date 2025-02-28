@@ -1,15 +1,25 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ar">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>لوحة الأدمن</title>
   <link rel="stylesheet" href="dashboard-styles.css">
   <style>
-    table {
+    /* أنماط خاصة بلوحة الأدمن */
+    .admin-container {
       width: 90%;
       margin: 20px auto;
+    }
+    .section-title {
+      text-align: center;
+      margin: 20px 0;
+      font-size: 24px;
+      color: #27293d;
+    }
+    table {
+      width: 100%;
       border-collapse: collapse;
+      margin-bottom: 20px;
     }
     th, td {
       border: 1px solid #ccc;
@@ -20,36 +30,132 @@
       background: #27293d;
       color: white;
     }
+    .edit-input {
+      width: 80%;
+      padding: 5px;
+    }
+    .btn {
+      padding: 5px 10px;
+      background: #28a745;
+      border: none;
+      color: white;
+      cursor: pointer;
+      border-radius: 5px;
+    }
+    .btn.edit {
+      background: #007bff;
+    }
+    .form-group {
+      margin-bottom: 10px;
+      text-align: center;
+    }
+    .form-group input, .form-group select {
+      padding: 5px;
+      width: 300px;
+    }
   </style>
 </head>
 <body>
-  <h2 style="text-align: center;">لوحة الأدمن - بيانات المستخدمين</h2>
-  <table>
-    <thead>
-      <tr>
-        <th>اسم المستخدم</th>
-        <th>كلمة المرور</th>
-        <th>العملات</th>
-        <th>اشترا بوت</th>
-      </tr>
-    </thead>
-    <tbody id="usersTable">
-    </tbody>
-  </table>
+  <h2 class="section-title">لوحة الأدمن - تعديل المستخدمين</h2>
+  <div class="admin-container">
+    <table id="usersTable">
+      <thead>
+        <tr>
+          <th>اسم المستخدم</th>
+          <th>كلمة المرور</th>
+          <th>العملات</th>
+          <th>بوت</th>
+          <th>إجراءات</th>
+        </tr>
+      </thead>
+      <tbody>
+        <!-- يتم تعبئة البيانات بواسطة جافاسكربت -->
+      </tbody>
+    </table>
+
+    <h2 class="section-title">إضافة أيتم جديد</h2>
+    <div class="admin-container">
+      <div class="form-group">
+        <input type="text" id="itemName" placeholder="اسم الأيتيم">
+      </div>
+      <div class="form-group">
+        <input type="text" id="itemImage" placeholder="رابط صورة الأيتيم">
+      </div>
+      <div class="form-group">
+        <select id="itemRarity">
+          <option value="عاديه">عاديه</option>
+          <option value="نادره">نادره</option>
+          <option value="اسطوريه">اسطوريه</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <button class="btn" onclick="addItem()">إضافة الأيتيم</button>
+      </div>
+    </div>
+  </div>
+
   <script>
-    const users = JSON.parse(localStorage.getItem('users')) || {};
-    const tableBody = document.getElementById('usersTable');
-    for(let username in users){
-      const user = users[username];
-      const row = document.createElement('tr');
-      row.innerHTML = `
-        <td>${username}</td>
-        <td>${user.password}</td>
-        <td>${user.coins || 0}</td>
-        <td>${user.boughtBot ? 'نعم' : 'لا'}</td>
-      `;
-      tableBody.appendChild(row);
+    // تحميل بيانات المستخدمين من التخزين المحلي وعرضها في الجدول
+    function loadUsers() {
+      const users = JSON.parse(localStorage.getItem('users')) || {};
+      const tbody = document.querySelector('#usersTable tbody');
+      tbody.innerHTML = '';
+      for (let username in users) {
+        const user = users[username];
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td>${username}</td>
+          <td><input class="edit-input" id="pass_${username}" value="${user.password}"></td>
+          <td><input class="edit-input" id="coins_${username}" type="number" value="${user.coins || 0}"></td>
+          <td>
+            <select id="bot_${username}">
+              <option value="false" ${!user.boughtBot ? 'selected' : ''}>لا</option>
+              <option value="true" ${user.boughtBot ? 'selected' : ''}>نعم</option>
+            </select>
+          </td>
+          <td>
+            <button class="btn edit" onclick="saveUser('${username}')">حفظ</button>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      }
     }
+
+    // حفظ التعديلات على بيانات المستخدم
+    function saveUser(username) {
+      const users = JSON.parse(localStorage.getItem('users')) || {};
+      if (users[username]) {
+        const newPass = document.getElementById('pass_' + username).value;
+        const newCoins = parseInt(document.getElementById('coins_' + username).value);
+        const newBot = document.getElementById('bot_' + username).value === 'true';
+        users[username].password = newPass;
+        users[username].coins = newCoins;
+        users[username].boughtBot = newBot;
+        localStorage.setItem('users', JSON.stringify(users));
+        alert('تم حفظ التعديلات للمستخدم ' + username);
+        loadUsers();
+      }
+    }
+
+    // دالة لإضافة أيتم جديد للتخزين المحلي
+    function addItem() {
+      const name = document.getElementById('itemName').value.trim();
+      const image = document.getElementById('itemImage').value.trim();
+      const rarity = document.getElementById('itemRarity').value;
+      if (!name || !image) {
+        alert('يرجى ملء جميع الحقول لإضافة أيتم');
+        return;
+      }
+      let items = JSON.parse(localStorage.getItem('items')) || [];
+      items.push({ name, image, rarity });
+      localStorage.setItem('items', JSON.stringify(items));
+      alert('تم إضافة الأيتيم بنجاح');
+      document.getElementById('itemName').value = '';
+      document.getElementById('itemImage').value = '';
+    }
+
+    // تهيئة لوحة الأدمن عند تحميل الصفحة
+    loadUsers();
   </script>
 </body>
 </html>
