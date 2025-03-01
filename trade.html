@@ -6,6 +6,7 @@
   <title>نظام تريد</title>
   <link rel="stylesheet" href="dashboard-styles.css">
   <style>
+    /* تنسيق نموذج إنشاء طلب التريد */
     .trade-form {
       width: 350px;
       margin: 20px auto;
@@ -13,13 +14,16 @@
       border: 2px solid #ccc;
       border-radius: 10px;
       text-align: center;
-      background: #f0f0f0;
+      background: #f7f7f7;
     }
-    .trade-form select, .trade-form input {
+    .trade-form select,
+    .trade-form input {
       width: 90%;
       padding: 10px;
       margin: 5px 0;
       box-sizing: border-box;
+      border: 1px solid #ddd;
+      border-radius: 5px;
     }
     .trade-form button {
       padding: 10px 20px;
@@ -30,21 +34,45 @@
       cursor: pointer;
       margin-top: 10px;
     }
+    /* تنسيق منطقة عرض طلبات التريد بشكل كتل */
     .trade-requests {
       width: 90%;
       margin: 20px auto;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
     }
     .trade-request {
-      border: 1px solid #ccc;
-      padding: 10px;
-      margin: 5px 0;
-      border-radius: 5px;
+      width: 300px;
       background: #fff;
+      border-radius: 8px;
+      margin: 10px;
+      padding: 15px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+      transition: transform 0.2s;
+    }
+    .trade-request:hover {
+      transform: scale(1.02);
+    }
+    .trade-request p {
+      margin: 8px 0;
+      line-height: 1.4;
+    }
+    .trade-request p strong {
+      color: #27293d;
+    }
+    .trade-request p small {
+      color: #666;
+    }
+    h2.trade-header {
+      text-align: center;
+      margin-top: 20px;
+      color: #27293d;
     }
   </style>
 </head>
 <body>
-  <h2 style="text-align: center;">نظام تريد</h2>
+  <h2 class="trade-header">نظام تريد</h2>
   <div class="trade-form">
     <h3>إنشاء طلب تريد</h3>
     <input type="text" id="tradeRecipient" placeholder="اسم المستخدم المستهدف" required>
@@ -65,7 +93,8 @@
   </div>
 
   <div class="trade-requests">
-    <h3>طلبات التي تريد الحالية</h3>
+    <!-- سيتم عرض طلبات التريد هنا في كتل أنيقة -->
+    <h3 style="width:100%; text-align:center; color:#27293d;">طلبات التريد الحالية</h3>
     <div id="tradeList"></div>
   </div>
 
@@ -83,7 +112,7 @@
       if(userItems.length === 0) {
         offerSelect.innerHTML = '<option value="">لا توجد أيتمات في مشترياتك</option>';
       } else {
-        userItems.forEach((item, index) => {
+        userItems.forEach((item) => {
           offerSelect.innerHTML += `<option value="${item.name}">${item.name}</option>`;
         });
       }
@@ -99,7 +128,7 @@
       if(items.length === 0) {
         requestSelect.innerHTML = '<option value="">لا توجد أيتمات متاحة</option>';
       } else {
-        items.forEach((item, index) => {
+        items.forEach((item) => {
           requestSelect.innerHTML += `<option value="${item.name}">${item.name} (${item.rarity})</option>`;
         });
       }
