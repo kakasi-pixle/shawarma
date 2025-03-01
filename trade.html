@@ -182,12 +182,11 @@
   </div>
   
   <script>
-    // تحديث آخر نشاط للمستخدم (تحديث timestamp)
-    const currentUser = localStorage.getItem('currentUser');
-    if (currentUser) {
+    // تحديث آخر نشاط للمستخدم عند دخوله
+    if(currentUser) {
       localStorage.setItem("lastActive_" + currentUser, Date.now());
     }
-
+    
     // دالة لتحديث خيارات العرض بناءً على النوع
     function updateOfferValues() {
       const type = document.getElementById('offerType').value;
@@ -199,7 +198,6 @@
       if(type === 'coins') {
         offerCoinsInput.style.display = 'block';
       } else if(type === 'item') {
-        // تعبئة القائمة بأيتمات المستخدم (من مشترياته)
         const users = JSON.parse(localStorage.getItem('users')) || {};
         let userItems = [];
         if(users[currentUser] && users[currentUser].purchases){
@@ -215,7 +213,6 @@
         }
         offerSelect.style.display = 'block';
       } else if(type === 'bot') {
-        // عرض خيار البوت إذا كان موجود
         const users = JSON.parse(localStorage.getItem('users')) || {};
         offerSelect.innerHTML = '';
         if(users[currentUser] && users[currentUser].boughtBot){
@@ -225,7 +222,6 @@
         }
         offerSelect.style.display = 'block';
       } else if(type === 'store') {
-        // قائمة من المتجر (الأصناف الموجودة في global items)
         const items = JSON.parse(localStorage.getItem('items')) || [];
         offerSelect.innerHTML = '';
         if(items.length === 0) {
@@ -250,7 +246,6 @@
       if(type === 'coins') {
         requestCoinsInput.style.display = 'block';
       } else if(type === 'item') {
-        // استخدام قائمة global items لعرض أيتمات الطلب
         const items = JSON.parse(localStorage.getItem('items')) || [];
         requestSelect.innerHTML = '';
         if(items.length === 0) {
@@ -278,7 +273,7 @@
       }
     }
     
-    // إنشاء طلب التريد مع حفظه في localStorage
+    // إنشاء طلب التريد مع التحقق من أن المستخدم المستهدف متصل
     function createTrade() {
       const recipient = document.getElementById('tradeRecipient').value.trim();
       const offerType = document.getElementById('offerType').value;
@@ -305,12 +300,15 @@
         requestValue = document.getElementById('requestValue').value;
       }
       
-      const sender = currentUser;
-      if (!sender) {
-        alert('يجب تسجيل الدخول!');
+      // التحقق من أن المستخدم المستهدف متصل (آخر نشاط خلال 5 دقائق)
+      const recipientLastActive = localStorage.getItem("lastActive_" + recipient);
+      if (!recipientLastActive || Date.now() - parseInt(recipientLastActive) > 300000) {
+        alert("المستخدم المستهدف غير متصل حالياً. يرجى اختيار مستخدم متصل.");
         return;
       }
-      if (!recipient || !offerType || !offerValue || !requestType || !requestValue) {
+      
+      const sender = currentUser;
+      if (!sender || !recipient || !offerType || !offerValue || !requestType || !requestValue) {
         alert('يرجى ملء جميع الحقول');
         return;
       }
@@ -336,12 +334,12 @@
       const now = Date.now();
       trades = trades.filter(trade => {
         const tradeTime = new Date(trade.time).getTime();
-        return now - tradeTime < 3600000; // أقل من ساعة
+        return now - tradeTime < 3600000;
       });
       localStorage.setItem('tradeRequests', JSON.stringify(trades));
     }
     
-    // دالة لعرض طلبات التريد في كروت أنيقة مع أزرار قبول ورفض للمتلقي (إذا كان المستخدم الحالي هو المستقبل)
+    // عرض الطلبات في كروت أنيقة مع أزرار قبول ورفض إذا كان المستخدم المستقبل
     function displayTrades() {
       clearOldTrades();
       const tradeList = document.getElementById('tradeList');
@@ -376,7 +374,7 @@
       });
     }
     
-    // دالة لقبول الطلب وتنفيذ التبادل بين الطرفين
+    // تنفيذ التبادل عند قبول الطلب
     function acceptTrade(index) {
       let trades = JSON.parse(localStorage.getItem('tradeRequests')) || [];
       const trade = trades[index];
@@ -384,12 +382,10 @@
         alert("ليس لديك صلاحية قبول هذا الطلب");
         return;
       }
-      // جلب بيانات المستخدمين
       const users = JSON.parse(localStorage.getItem('users')) || {};
       const senderUser = users[trade.sender];
       const recipientUser = users[trade.recipient];
       
-      // دوال مساعدة لمعالجة التبادل
       function transferCoins(fromUser, toUser, amount) {
         amount = parseInt(amount);
         if(fromUser.coins < amount) return false;
@@ -399,9 +395,9 @@
       }
       function transferItem(fromUser, toUser, itemName) {
         if(!fromUser.purchases) return false;
-        const index = fromUser.purchases.findIndex(i => i.name === itemName);
-        if(index === -1) return false;
-        const item = fromUser.purchases.splice(index, 1)[0];
+        const idx = fromUser.purchases.findIndex(i => i.name === itemName);
+        if(idx === -1) return false;
+        const item = fromUser.purchases.splice(idx, 1)[0];
         if(!toUser.purchases) toUser.purchases = [];
         toUser.purchases.push(item);
         return true;
@@ -414,36 +410,34 @@
       }
       
       let success = false;
-      // تنفيذ التبادل بناءً على أنواع العرض والطلب
-      // المثال: إذا كان العرض عملات والطلب أيتم
       if(trade.offer.type === "coins" && trade.request.type === "item") {
-        if(transferCoins(senderUser, recipientUser, trade.offer.value) && transferItem(recipientUser, senderUser, trade.request.value)) {
+        if(transferCoins(senderUser, recipientUser, trade.offer.value) &&
+           transferItem(recipientUser, senderUser, trade.request.value)) {
           success = true;
         }
       } else if(trade.offer.type === "item" && trade.request.type === "coins") {
-        if(transferItem(senderUser, recipientUser, trade.offer.value) && transferCoins(recipientUser, senderUser, trade.request.value)) {
+        if(transferItem(senderUser, recipientUser, trade.offer.value) &&
+           transferCoins(recipientUser, senderUser, trade.request.value)) {
           success = true;
         }
       } else if(trade.offer.type === trade.request.type && trade.offer.type === "coins") {
-        // تبادل العملات (ربما مجرد تحويل دون تغيير)
-        // هنا نقوم بتبديل العملات بين الطرفين إذا كانت المبالغ متساوية
         if(trade.offer.value === trade.request.value) {
           success = true;
         }
       } else if(trade.offer.type === "item" && trade.request.type === "item") {
-        if(transferItem(senderUser, recipientUser, trade.offer.value) && transferItem(recipientUser, senderUser, trade.request.value)) {
+        if(transferItem(senderUser, recipientUser, trade.offer.value) &&
+           transferItem(recipientUser, senderUser, trade.request.value)) {
           success = true;
         }
       } else if(trade.offer.type === "bot" && trade.request.type === "bot") {
-        if(transferBot(senderUser, recipientUser) && transferBot(recipientUser, senderUser)) {
+        if(transferBot(senderUser, recipientUser) &&
+           transferBot(recipientUser, senderUser)) {
           success = true;
         }
       }
-      // يمكن إضافة حالات تبادل أخرى حسب الحاجة
       
       if(success) {
         localStorage.setItem('users', JSON.stringify(users));
-        // إزالة الطلب من القائمة
         trades.splice(index, 1);
         localStorage.setItem('tradeRequests', JSON.stringify(trades));
         displayTrades();
@@ -453,7 +447,6 @@
       }
     }
     
-    // دالة لرفض الطلب (حذف الطلب)
     function declineTrade(index) {
       let trades = JSON.parse(localStorage.getItem('tradeRequests')) || [];
       trades.splice(index, 1);
@@ -462,10 +455,7 @@
       alert("تم رفض الطلب");
     }
     
-    // تشغيل تنظيف الطلبات القديمة تلقائيًا كل ساعة
     setInterval(clearOldTrades, 3600000);
-    
-    // عند تحميل الصفحة
     updateOfferValues();
     updateRequestValues();
     displayTrades();
