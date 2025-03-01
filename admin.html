@@ -2,148 +2,267 @@
 <html lang="ar">
 <head>
   <meta charset="UTF-8">
-  <title>لوحة الأدمن</title>
+  <title>لوحة التحكم - الأدمن</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="stylesheet" href="dashboard-styles.css">
   <style>
-    /* أنماط خاصة بلوحة الأدمن */
-    .admin-container {
-      width: 90%;
-      margin: 20px auto;
+    /* إعدادات عامة */
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      direction: rtl;
+      background: #f4f7fa;
     }
-    .section-title {
+    .admin-container {
+      display: flex;
+      height: 100vh;
+    }
+    /* الشريط الجانبي */
+    .sidebar {
+      width: 250px;
+      background: #27293d;
+      color: #fff;
+      padding: 20px;
+      box-sizing: border-box;
+    }
+    .sidebar h2 {
+      margin-top: 0;
       text-align: center;
+      font-size: 24px;
+    }
+    .sidebar ul {
+      list-style: none;
+      padding: 0;
+      margin-top: 30px;
+    }
+    .sidebar ul li {
       margin: 20px 0;
+    }
+    .sidebar ul li a {
+      color: #fff;
+      text-decoration: none;
+      font-size: 18px;
+      transition: color 0.3s;
+    }
+    .sidebar ul li a:hover {
+      color: #ff5722;
+    }
+    /* المحتوى الرئيسي */
+    .main-content {
+      flex: 1;
+      background: #f0f0f0;
+      padding: 20px;
+      overflow-y: auto;
+    }
+    .header-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: #fff;
+      padding: 10px 20px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      border-radius: 5px;
+    }
+    .header-bar h1 {
+      margin: 0;
       font-size: 24px;
       color: #27293d;
     }
+    .header-bar button {
+      background: #ff5722;
+      border: none;
+      color: #fff;
+      padding: 8px 16px;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    /* تبويبات المحتوى */
+    .tab {
+      display: none;
+      margin-top: 20px;
+    }
+    .tab.active {
+      display: block;
+    }
+    /* تنسيق الجداول */
     table {
       width: 100%;
       border-collapse: collapse;
-      margin-bottom: 20px;
+      margin-top: 20px;
+      background: #fff;
+      border-radius: 5px;
+      overflow: hidden;
     }
-    th, td {
-      border: 1px solid #ccc;
+    table th, table td {
       padding: 10px;
+      border: 1px solid #ccc;
       text-align: center;
     }
-    th {
+    table th {
       background: #27293d;
-      color: white;
+      color: #fff;
     }
-    .edit-input {
-      width: 80%;
-      padding: 5px;
+    /* تنسيق النماذج */
+    .form-section {
+      background: #fff;
+      padding: 20px;
+      margin-top: 20px;
+      border-radius: 5px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
     }
-    .btn {
-      padding: 5px 10px;
+    .form-section input, 
+    .form-section select {
+      width: 100%;
+      padding: 8px;
+      margin: 8px 0;
+      box-sizing: border-box;
+      border: 1px solid #ccc;
+      border-radius: 3px;
+    }
+    .form-section button {
+      padding: 10px 20px;
       background: #28a745;
       border: none;
-      color: white;
-      cursor: pointer;
+      color: #fff;
       border-radius: 5px;
-    }
-    .btn.edit {
-      background: #007bff;
-    }
-    .form-group {
-      margin-bottom: 10px;
-      text-align: center;
-    }
-    .form-group input, .form-group select {
-      padding: 5px;
-      width: 300px;
+      cursor: pointer;
     }
   </style>
 </head>
 <body>
-  <h2 class="section-title">لوحة الأدمن - تعديل المستخدمين</h2>
   <div class="admin-container">
-    <table id="usersTable">
-      <thead>
-        <tr>
-          <th>اسم المستخدم</th>
-          <th>كلمة المرور</th>
-          <th>العملات</th>
-          <th>بوت</th>
-          <th>إجراءات</th>
-        </tr>
-      </thead>
-      <tbody>
-        <!-- يتم تعبئة البيانات بواسطة جافاسكربت -->
-      </tbody>
-    </table>
-
-    <h2 class="section-title">إضافة أيتم جديد</h2>
-    <div class="admin-container">
-      <div class="form-group">
-        <input type="text" id="itemName" placeholder="اسم الأيتيم">
+    <!-- الشريط الجانبي -->
+    <div class="sidebar">
+      <h2>لوحة الأدمن</h2>
+      <ul>
+        <li><a href="#" onclick="showTab('usersTab')">إدارة المستخدمين</a></li>
+        <li><a href="#" onclick="showTab('addItemTab')">إضافة أيتمات</a></li>
+        <li><a href="#" onclick="showTab('grantAdminTab')">منح صلاحيات الأدمن</a></li>
+        <li><a href="#" onclick="logout()">تسجيل الخروج</a></li>
+      </ul>
+    </div>
+    <!-- المحتوى الرئيسي -->
+    <div class="main-content">
+      <div class="header-bar">
+        <h1>لوحة التحكم</h1>
+        <button onclick="logout()">تسجيل الخروج</button>
       </div>
-      <div class="form-group">
-        <input type="text" id="itemImage" placeholder="رابط صورة الأيتيم">
+      <!-- تبويب إدارة المستخدمين -->
+      <div id="usersTab" class="tab active">
+        <h2>إدارة المستخدمين</h2>
+        <table id="usersTable">
+          <thead>
+            <tr>
+              <th>اسم المستخدم</th>
+              <th>كلمة المرور</th>
+              <th>العملات</th>
+              <th>بوت</th>
+              <th>صلاحيات الأدمن</th>
+              <th>إجراءات</th>
+            </tr>
+          </thead>
+          <tbody>
+            <!-- يتم تعبئة بيانات المستخدمين بواسطة جافاسكربت -->
+          </tbody>
+        </table>
       </div>
-      <div class="form-group">
-        <select id="itemRarity">
-          <option value="عاديه">عاديه</option>
-          <option value="نادره">نادره</option>
-          <option value="اسطوريه">اسطوريه</option>
-        </select>
+      <!-- تبويب إضافة أيتمات -->
+      <div id="addItemTab" class="tab">
+        <h2>إضافة أيتم جديد</h2>
+        <div class="form-section">
+          <input type="text" id="itemName" placeholder="اسم الأيتيم">
+          <input type="text" id="itemImage" placeholder="رابط صورة الأيتيم">
+          <select id="itemRarity">
+            <option value="عاديه">عاديه</option>
+            <option value="نادره">نادره</option>
+            <option value="اسطوريه">اسطوريه</option>
+          </select>
+          <button onclick="addItem()">إضافة الأيتيم</button>
+        </div>
       </div>
-      <div class="form-group">
-        <button class="btn" onclick="addItem()">إضافة الأيتيم</button>
+      <!-- تبويب منح صلاحيات الأدمن -->
+      <div id="grantAdminTab" class="tab">
+        <h2>منح صلاحيات الأدمن</h2>
+        <div class="form-section">
+          <input type="text" id="grantUsername" placeholder="اسم المستخدم">
+          <select id="grantStatus">
+            <option value="true">منح صلاحية الأدمن</option>
+            <option value="false">إلغاء صلاحية الأدمن</option>
+          </select>
+          <button onclick="grantAdmin()">تنفيذ</button>
+        </div>
       </div>
     </div>
   </div>
 
   <script>
-    // تحميل بيانات المستخدمين من التخزين المحلي وعرضها في الجدول
+    // دالة التبديل بين التبويبات
+    function showTab(tabId) {
+      const tabs = document.querySelectorAll('.tab');
+      tabs.forEach(tab => {
+        tab.classList.remove('active');
+      });
+      document.getElementById(tabId).classList.add('active');
+      if(tabId === 'usersTab'){
+        loadUsers();
+      }
+    }
+    
+    // تحميل بيانات المستخدمين من localStorage وعرضها
     function loadUsers() {
       const users = JSON.parse(localStorage.getItem('users')) || {};
       const tbody = document.querySelector('#usersTable tbody');
       tbody.innerHTML = '';
       for (let username in users) {
         const user = users[username];
-        const tr = document.createElement('tr');
-        tr.innerHTML = `
-          <td>${username}</td>
-          <td><input class="edit-input" id="pass_${username}" value="${user.password}"></td>
-          <td><input class="edit-input" id="coins_${username}" type="number" value="${user.coins || 0}"></td>
-          <td>
-            <select id="bot_${username}">
-              <option value="false" ${!user.boughtBot ? 'selected' : ''}>لا</option>
-              <option value="true" ${user.boughtBot ? 'selected' : ''}>نعم</option>
-            </select>
-          </td>
-          <td>
-            <button class="btn edit" onclick="saveUser('${username}')">حفظ</button>
-          </td>
+        tbody.innerHTML += `
+          <tr>
+            <td>${username}</td>
+            <td><input type="text" id="pass_${username}" value="${user.password}"></td>
+            <td><input type="number" id="coins_${username}" value="${user.coins || 0}"></td>
+            <td>
+              <select id="bot_${username}">
+                <option value="false" ${!user.boughtBot ? 'selected' : ''}>لا</option>
+                <option value="true" ${user.boughtBot ? 'selected' : ''}>نعم</option>
+              </select>
+            </td>
+            <td>
+              <select id="admin_${username}">
+                <option value="false" ${!user.isAdmin ? 'selected' : ''}>لا</option>
+                <option value="true" ${user.isAdmin ? 'selected' : ''}>نعم</option>
+              </select>
+            </td>
+            <td><button onclick="saveUser('${username}')">حفظ</button></td>
+          </tr>
         `;
-        tbody.appendChild(tr);
       }
     }
-
+    
     // حفظ التعديلات على بيانات المستخدم
     function saveUser(username) {
       const users = JSON.parse(localStorage.getItem('users')) || {};
-      if (users[username]) {
+      if(users[username]){
         const newPass = document.getElementById('pass_' + username).value;
         const newCoins = parseInt(document.getElementById('coins_' + username).value);
         const newBot = document.getElementById('bot_' + username).value === 'true';
+        const newAdmin = document.getElementById('admin_' + username).value === 'true';
         users[username].password = newPass;
         users[username].coins = newCoins;
         users[username].boughtBot = newBot;
+        users[username].isAdmin = newAdmin;
         localStorage.setItem('users', JSON.stringify(users));
         alert('تم حفظ التعديلات للمستخدم ' + username);
         loadUsers();
       }
     }
-
-    // دالة لإضافة أيتم جديد للتخزين المحلي
+    
+    // دالة لإضافة أيتم جديد
     function addItem() {
       const name = document.getElementById('itemName').value.trim();
       const image = document.getElementById('itemImage').value.trim();
       const rarity = document.getElementById('itemRarity').value;
-      if (!name || !image) {
-        alert('يرجى ملء جميع الحقول لإضافة أيتم');
+      if(!name || !image){
+        alert('يرجى ملء جميع الحقول');
         return;
       }
       let items = JSON.parse(localStorage.getItem('items')) || [];
@@ -153,9 +272,32 @@
       document.getElementById('itemName').value = '';
       document.getElementById('itemImage').value = '';
     }
-
-    // تهيئة لوحة الأدمن عند تحميل الصفحة
-    loadUsers();
+    
+    // منح صلاحيات الأدمن لمستخدم
+    function grantAdmin() {
+      const username = document.getElementById('grantUsername').value.trim();
+      const status = document.getElementById('grantStatus').value === 'true';
+      const users = JSON.parse(localStorage.getItem('users')) || {};
+      if(users[username]){
+        users[username].isAdmin = status;
+        localStorage.setItem('users', JSON.stringify(users));
+        alert('تم تعديل صلاحيات المستخدم ' + username);
+        loadUsers();
+      } else {
+        alert('المستخدم غير موجود');
+      }
+    }
+    
+    // تسجيل الخروج
+    function logout() {
+      localStorage.removeItem('currentUser');
+      window.location.href = 'index.html';
+    }
+    
+    // تحميل بيانات المستخدمين عند فتح الصفحة
+    window.onload = function() {
+      loadUsers();
+    }
   </script>
 </body>
 </html>
