@@ -13,8 +13,9 @@
       border: 2px solid #ccc;
       border-radius: 10px;
       text-align: center;
+      background: #f0f0f0;
     }
-    .trade-form input, .trade-form select {
+    .trade-form select, .trade-form input {
       width: 90%;
       padding: 10px;
       margin: 5px 0;
@@ -38,7 +39,7 @@
       padding: 10px;
       margin: 5px 0;
       border-radius: 5px;
-      background: #f9f9f9;
+      background: #fff;
     }
   </style>
 </head>
@@ -48,19 +49,17 @@
     <h3>إنشاء طلب تريد</h3>
     <input type="text" id="tradeRecipient" placeholder="اسم المستخدم المستهدف" required>
     
-    <label for="offerType">نوع العرض:</label>
-    <select id="offerType">
-      <option value="coins">عملات</option>
-      <option value="item">عنصر</option>
+    <!-- اختيار العنصر المقدم من المستخدم -->
+    <label>اختر العنصر الذي تعرضه:</label>
+    <select id="offerItem">
+      <!-- سيتم تعبئته ديناميكياً من مشتريات المستخدم -->
     </select>
-    <input type="text" id="offerValue" placeholder="قيمة العرض (مثلاً: 50 أو بوت)" required>
     
-    <label for="requestType">نوع الطلب:</label>
-    <select id="requestType">
-      <option value="coins">عملات</option>
-      <option value="item">عنصر</option>
+    <!-- اختيار العنصر المطلوب من النظام -->
+    <label>اختر العنصر الذي تطلبه:</label>
+    <select id="requestItem">
+      <!-- سيتم تعبئته ديناميكياً من الأيتيمات المتوفرة -->
     </select>
-    <input type="text" id="requestValue" placeholder="قيمة الطلب (مثلاً: 100 أو رقم فيك)" required>
     
     <button onclick="createTrade()">إرسال الطلب</button>
   </div>
@@ -71,19 +70,54 @@
   </div>
 
   <script>
+    // تعبئة قائمة العناصر التي يعرضها المستخدم من مشترياته
+    function loadUserItems() {
+      const currentUser = localStorage.getItem('currentUser');
+      const users = JSON.parse(localStorage.getItem('users')) || {};
+      let userItems = [];
+      if (users[currentUser] && users[currentUser].purchases) {
+        userItems = users[currentUser].purchases;
+      }
+      const offerSelect = document.getElementById('offerItem');
+      offerSelect.innerHTML = '';
+      if(userItems.length === 0) {
+        offerSelect.innerHTML = '<option value="">لا توجد أيتمات في مشترياتك</option>';
+      } else {
+        userItems.forEach((item, index) => {
+          offerSelect.innerHTML += `<option value="${item.name}">${item.name}</option>`;
+        });
+      }
+      // إضافة خيار للعرض بالعملات إذا رغب المستخدم
+      offerSelect.innerHTML += `<option value="coins">عملات</option>`;
+    }
+
+    // تعبئة قائمة العناصر المطلوبة من المخزون العام للأيتيمات
+    function loadGlobalItems() {
+      const items = JSON.parse(localStorage.getItem('items')) || [];
+      const requestSelect = document.getElementById('requestItem');
+      requestSelect.innerHTML = '';
+      if(items.length === 0) {
+        requestSelect.innerHTML = '<option value="">لا توجد أيتمات متاحة</option>';
+      } else {
+        items.forEach((item, index) => {
+          requestSelect.innerHTML += `<option value="${item.name}">${item.name} (${item.rarity})</option>`;
+        });
+      }
+      // إضافة خيار للطلب بالعملات
+      requestSelect.innerHTML += `<option value="coins">عملات</option>`;
+    }
+
     function createTrade() {
       const recipient = document.getElementById('tradeRecipient').value.trim();
-      const offerType = document.getElementById('offerType').value;
-      const offerValue = document.getElementById('offerValue').value.trim();
-      const requestType = document.getElementById('requestType').value;
-      const requestValue = document.getElementById('requestValue').value.trim();
+      const offer = document.getElementById('offerItem').value;
+      const request = document.getElementById('requestItem').value;
       const sender = localStorage.getItem('currentUser');
 
       if (!sender) {
         alert('يجب تسجيل الدخول!');
         return;
       }
-      if (!recipient || !offerValue || !requestValue) {
+      if (!recipient || !offer || !request) {
         alert('يرجى ملء جميع الحقول');
         return;
       }
@@ -92,18 +126,15 @@
       const trade = {
         sender,
         recipient,
-        offer: { type: offerType, value: offerValue },
-        request: { type: requestType, value: requestValue },
+        offer,
+        request,
         time: new Date().toLocaleString()
       };
       trades.push(trade);
       localStorage.setItem('tradeRequests', JSON.stringify(trades));
       displayTrades();
       alert('تم إرسال طلب التريد');
-      // تنظيف الحقول بعد الإرسال
       document.getElementById('tradeRecipient').value = '';
-      document.getElementById('offerValue').value = '';
-      document.getElementById('requestValue').value = '';
     }
 
     function displayTrades() {
@@ -116,14 +147,16 @@
         div.innerHTML = `
           <p><strong>المرسل:</strong> ${trade.sender}</p>
           <p><strong>المستقبل:</strong> ${trade.recipient}</p>
-          <p><strong>يعرض:</strong> ${trade.offer.value} (${trade.offer.type === 'coins' ? 'عملات' : 'عنصر'})</p>
-          <p><strong>يطلب:</strong> ${trade.request.value} (${trade.request.type === 'coins' ? 'عملات' : 'عنصر'})</p>
+          <p><strong>يعرض:</strong> ${trade.offer} ${trade.offer === 'coins' ? '(عملات)' : ''}</p>
+          <p><strong>يطلب:</strong> ${trade.request} ${trade.request === 'coins' ? '(عملات)' : ''}</p>
           <p><small>${trade.time}</small></p>
         `;
         tradeList.appendChild(div);
       });
     }
 
+    loadUserItems();
+    loadGlobalItems();
     displayTrades();
   </script>
 </body>
