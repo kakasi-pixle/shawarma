@@ -3,101 +3,113 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>نظام تريد</title>
+  <title>نظام تريد - Blox Fruit Style</title>
   <link rel="stylesheet" href="dashboard-styles.css">
   <style>
-    /* تنسيق نموذج إنشاء طلب التريد */
-    .trade-form {
-      width: 350px;
-      margin: 20px auto;
-      padding: 20px;
-      border: 2px solid #ccc;
-      border-radius: 10px;
-      text-align: center;
-      background: #f7f7f7;
+    body {
+      background: #0d0d0d;
+      font-family: 'Arial', sans-serif;
+      color: #fff;
+      direction: rtl;
+      margin: 0;
+      padding: 0;
     }
-    .trade-form select,
-    .trade-form input {
+    .trade-container {
       width: 90%;
-      padding: 10px;
-      margin: 5px 0;
-      box-sizing: border-box;
-      border: 1px solid #ddd;
-      border-radius: 5px;
+      max-width: 1200px;
+      margin: 20px auto;
     }
-    .trade-form button {
-      padding: 10px 20px;
-      background: #007bff;
+    .trade-header {
+      text-align: center;
+      font-size: 32px;
+      margin-bottom: 20px;
+      color: #ff6a00;
+      text-shadow: 2px 2px 4px rgba(0,0,0,0.7);
+    }
+    .trade-form {
+      background: linear-gradient(45deg, #ff6a00, #ee0979);
+      border-radius: 10px;
+      padding: 20px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+      text-align: center;
+      margin-bottom: 30px;
+    }
+    .trade-form h3 {
+      margin-bottom: 15px;
+      font-size: 24px;
+    }
+    .trade-form input,
+    .trade-form select {
+      width: 90%;
+      padding: 12px;
+      margin: 10px 0;
       border: none;
       border-radius: 5px;
-      color: white;
+      font-size: 16px;
+    }
+    .trade-form button {
+      padding: 12px 30px;
+      font-size: 18px;
+      border: none;
+      border-radius: 5px;
+      background: #28a745;
+      color: #fff;
       cursor: pointer;
       margin-top: 10px;
+      transition: background 0.3s ease;
     }
-    /* تنسيق منطقة عرض طلبات التريد بشكل كتل */
+    .trade-form button:hover {
+      background: #218838;
+    }
     .trade-requests {
-      width: 90%;
-      margin: 20px auto;
       display: flex;
       flex-wrap: wrap;
       justify-content: center;
+      gap: 20px;
     }
-    .trade-request {
-      width: 300px;
-      background: #fff;
-      border-radius: 8px;
-      margin: 10px;
+    .trade-card {
+      background: #1e1e1e;
+      border-radius: 10px;
       padding: 15px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.15);
-      transition: transform 0.2s;
+      width: 280px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.5);
+      transition: transform 0.2s ease;
     }
-    .trade-request:hover {
-      transform: scale(1.02);
+    .trade-card:hover {
+      transform: scale(1.05);
     }
-    .trade-request p {
+    .trade-card p {
       margin: 8px 0;
-      line-height: 1.4;
+      font-size: 16px;
     }
-    .trade-request p strong {
-      color: #27293d;
+    .trade-card p strong {
+      color: #ff6a00;
     }
-    .trade-request p small {
-      color: #666;
-    }
-    h2.trade-header {
-      text-align: center;
-      margin-top: 20px;
-      color: #27293d;
+    .trade-card p small {
+      color: #aaa;
     }
   </style>
 </head>
 <body>
-  <h2 class="trade-header">نظام تريد</h2>
-  <div class="trade-form">
-    <h3>إنشاء طلب تريد</h3>
-    <input type="text" id="tradeRecipient" placeholder="اسم المستخدم المستهدف" required>
-    
-    <!-- اختيار العنصر المقدم من المستخدم -->
-    <label>اختر العنصر الذي تعرضه:</label>
-    <select id="offerItem">
-      <!-- سيتم تعبئته ديناميكياً من مشتريات المستخدم -->
-    </select>
-    
-    <!-- اختيار العنصر المطلوب من النظام -->
-    <label>اختر العنصر الذي تطلبه:</label>
-    <select id="requestItem">
-      <!-- سيتم تعبئته ديناميكياً من الأيتيمات المتوفرة -->
-    </select>
-    
-    <button onclick="createTrade()">إرسال الطلب</button>
+  <div class="trade-container">
+    <h2 class="trade-header">نظام تريد</h2>
+    <div class="trade-form">
+      <h3>إنشاء طلب تريد</h3>
+      <input type="text" id="tradeRecipient" placeholder="اسم المستخدم المستهدف" required>
+      <label style="display:block; margin-top:10px;">اختر العنصر الذي تعرضه:</label>
+      <select id="offerItem">
+        <!-- سيتم تعبئته ديناميكياً من مشتريات المستخدم -->
+      </select>
+      <label style="display:block; margin-top:10px;">اختر العنصر الذي تطلبه:</label>
+      <select id="requestItem">
+        <!-- سيتم تعبئته ديناميكياً من الأيتيمات المتوفرة -->
+      </select>
+      <button onclick="createTrade()">إرسال الطلب</button>
+    </div>
+    <div class="trade-requests" id="tradeList">
+      <!-- سيتم عرض طلبات التريد هنا على شكل كروت -->
+    </div>
   </div>
-
-  <div class="trade-requests">
-    <!-- سيتم عرض طلبات التريد هنا في كتل أنيقة -->
-    <h3 style="width:100%; text-align:center; color:#27293d;">طلبات التريد الحالية</h3>
-    <div id="tradeList"></div>
-  </div>
-
   <script>
     // تعبئة قائمة العناصر التي يعرضها المستخدم من مشترياته
     function loadUserItems() {
@@ -119,7 +131,6 @@
       // إضافة خيار للعرض بالعملات إذا رغب المستخدم
       offerSelect.innerHTML += `<option value="coins">عملات</option>`;
     }
-
     // تعبئة قائمة العناصر المطلوبة من المخزون العام للأيتيمات
     function loadGlobalItems() {
       const items = JSON.parse(localStorage.getItem('items')) || [];
@@ -135,13 +146,11 @@
       // إضافة خيار للطلب بالعملات
       requestSelect.innerHTML += `<option value="coins">عملات</option>`;
     }
-
     function createTrade() {
       const recipient = document.getElementById('tradeRecipient').value.trim();
       const offer = document.getElementById('offerItem').value;
       const request = document.getElementById('requestItem').value;
       const sender = localStorage.getItem('currentUser');
-
       if (!sender) {
         alert('يجب تسجيل الدخول!');
         return;
@@ -150,7 +159,6 @@
         alert('يرجى ملء جميع الحقول');
         return;
       }
-
       let trades = JSON.parse(localStorage.getItem('tradeRequests')) || [];
       const trade = {
         sender,
@@ -165,25 +173,23 @@
       alert('تم إرسال طلب التريد');
       document.getElementById('tradeRecipient').value = '';
     }
-
     function displayTrades() {
       const tradeList = document.getElementById('tradeList');
       tradeList.innerHTML = '';
       const trades = JSON.parse(localStorage.getItem('tradeRequests')) || [];
       trades.forEach(trade => {
-        const div = document.createElement('div');
-        div.className = 'trade-request';
-        div.innerHTML = `
+        const card = document.createElement('div');
+        card.className = 'trade-card';
+        card.innerHTML = `
           <p><strong>المرسل:</strong> ${trade.sender}</p>
           <p><strong>المستقبل:</strong> ${trade.recipient}</p>
           <p><strong>يعرض:</strong> ${trade.offer} ${trade.offer === 'coins' ? '(عملات)' : ''}</p>
           <p><strong>يطلب:</strong> ${trade.request} ${trade.request === 'coins' ? '(عملات)' : ''}</p>
           <p><small>${trade.time}</small></p>
         `;
-        tradeList.appendChild(div);
+        tradeList.appendChild(card);
       });
     }
-
     loadUserItems();
     loadGlobalItems();
     displayTrades();
