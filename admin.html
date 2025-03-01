@@ -129,7 +129,7 @@
       box-shadow: 0 1px 3px rgba(0,0,0,0.3);
     }
     .form-section input, 
-    .form-section select, 
+    .form-section select,
     .form-section textarea {
       width: 100%;
       padding: 6px;
@@ -179,6 +179,7 @@
         <h1>لوحة التحكم</h1>
         <button onclick="logout()">تسجيل الخروج</button>
       </div>
+      <!-- تبويب إدارة المستخدمين -->
       <div id="usersTab" class="tab active">
         <h2>إدارة المستخدمين</h2>
         <table id="usersTable">
@@ -193,10 +194,11 @@
             </tr>
           </thead>
           <tbody>
-            <!-- بيانات المستخدمين ستُحمَّل هنا -->
+            <!-- بيانات المستخدمين تُحمَّل هنا -->
           </tbody>
         </table>
       </div>
+      <!-- تبويب إضافة أيتمات -->
       <div id="addItemTab" class="tab">
         <h2>إضافة أيتم جديد</h2>
         <div class="form-section">
@@ -210,6 +212,7 @@
           <button onclick="addItem()">إضافة الأيتيم</button>
         </div>
       </div>
+      <!-- تبويب منح صلاحيات الأدمن -->
       <div id="grantAdminTab" class="tab">
         <h2>منح صلاحيات الأدمن</h2>
         <div class="form-section">
@@ -221,11 +224,15 @@
           <button onclick="grantAdmin()">تنفيذ</button>
         </div>
       </div>
+      <!-- تبويب الأخبار والإعلانات -->
       <div id="newsTab" class="tab">
         <h2>أخبار وإعلانات</h2>
         <div class="form-section">
           <textarea id="newsContent" style="height:150px;" placeholder="أدخل الأخبار والإعلانات هنا..."></textarea>
           <button onclick="saveNews()">حفظ الأخبار</button>
+        </div>
+        <div class="news-section" id="displayNews" style="margin-top:10px;">
+          <!-- سيتم عرض الأخبار هنا -->
         </div>
       </div>
     </div>
@@ -243,6 +250,7 @@
         loadNews();
       }
     }
+    
     function loadUsers() {
       const users = JSON.parse(localStorage.getItem('users')) || {};
       const tbody = document.querySelector('#usersTable tbody');
@@ -271,6 +279,7 @@
         `;
       }
     }
+    
     function saveUser(username) {
       const users = JSON.parse(localStorage.getItem('users')) || {};
       if(users[username]){
@@ -287,6 +296,7 @@
         loadUsers();
       }
     }
+    
     function addItem() {
       const name = document.getElementById('itemName').value.trim();
       const image = document.getElementById('itemImage').value.trim();
@@ -302,6 +312,7 @@
       document.getElementById('itemName').value = '';
       document.getElementById('itemImage').value = '';
     }
+    
     function grantAdmin() {
       const username = document.getElementById('grantUsername').value.trim();
       const status = document.getElementById('grantStatus').value === 'true';
@@ -315,22 +326,29 @@
         alert('المستخدم غير موجود');
       }
     }
+    
     function logout() {
       localStorage.removeItem('currentUser');
       window.location.href = 'index.html';
     }
+    
+    // دوال الأخبار والإعلانات
     function loadNews() {
       let news = localStorage.getItem('news');
       if (!news) {
         news = "لا توجد أخبار حالياً.";
       }
       document.getElementById('newsContent').value = news;
+      document.getElementById('displayNews').innerHTML = `<p>${news}</p>`;
     }
+    
     function saveNews() {
       const newsText = document.getElementById('newsContent').value;
       localStorage.setItem('news', newsText);
       alert("تم حفظ الأخبار والإعلانات");
+      loadNews();
     }
+    
     window.onload = function() {
       loadUsers();
     }
@@ -338,7 +356,6 @@
     // إعداد زر تبديل وضع الأدمن في صفحة الأدمن
     const adminBtn = document.getElementById('adminToggleBtn');
     if(adminBtn) {
-      // إذا كنا في صفحة الأدمن، يعرض "خروج من وضع الأدمن"
       if(window.location.href.indexOf('admin.html') !== -1) {
         adminBtn.textContent = 'خروج من وضع الأدمن';
         adminBtn.onclick = function() {
