@@ -3,12 +3,12 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>نظام تريد - </title>
+  <title>نظام تريد متقدم</title>
   <link rel="stylesheet" href="dashboard-styles.css">
   <style>
     body {
       background: #0d0d0d;
-      font-family: 'Arial', sans-serif;
+      font-family: Arial, sans-serif;
       color: #fff;
       direction: rtl;
       margin: 0;
@@ -38,11 +38,17 @@
       margin-bottom: 15px;
       font-size: 24px;
     }
-    .trade-form input,
-    .trade-form select {
+    .trade-form label {
+      display: block;
+      margin: 10px 0 5px;
+      font-size: 16px;
+    }
+    .trade-form select,
+    .trade-form input[type="text"],
+    .trade-form input[type="number"] {
       width: 90%;
       padding: 12px;
-      margin: 10px 0;
+      margin-bottom: 10px;
       border: none;
       border-radius: 5px;
       font-size: 16px;
@@ -55,11 +61,27 @@
       background: #28a745;
       color: #fff;
       cursor: pointer;
-      margin-top: 10px;
       transition: background 0.3s ease;
     }
     .trade-form button:hover {
       background: #218838;
+    }
+    .trade-section {
+      display: flex;
+      justify-content: space-around;
+      flex-wrap: wrap;
+      margin-top: 20px;
+    }
+    .trade-part {
+      width: 45%;
+      background: rgba(255,255,255,0.1);
+      padding: 15px;
+      border-radius: 8px;
+    }
+    .trade-part h4 {
+      margin-bottom: 10px;
+      font-size: 20px;
+      color: #ff6a00;
     }
     .trade-requests {
       display: flex;
@@ -71,7 +93,7 @@
       background: #1e1e1e;
       border-radius: 10px;
       padding: 15px;
-      width: 280px;
+      width: 300px;
       box-shadow: 0 2px 8px rgba(0,0,0,0.5);
       transition: transform 0.2s ease;
     }
@@ -92,79 +114,195 @@
 </head>
 <body>
   <div class="trade-container">
-    <h2 class="trade-header">نظام تريد</h2>
+    <h2 class="trade-header">نظام تريد متقدم</h2>
     <div class="trade-form">
       <h3>إنشاء طلب تريد</h3>
+      <label>اسم المستخدم المستهدف:</label>
       <input type="text" id="tradeRecipient" placeholder="اسم المستخدم المستهدف" required>
-      <label style="display:block; margin-top:10px;">اختر العنصر الذي تعرضه:</label>
-      <select id="offerItem">
-        <!-- سيتم تعبئته ديناميكياً من مشتريات المستخدم -->
-      </select>
-      <label style="display:block; margin-top:10px;">اختر العنصر الذي تطلبه:</label>
-      <select id="requestItem">
-        <!-- سيتم تعبئته ديناميكياً من الأيتيمات المتوفرة -->
-      </select>
+      
+      <div class="trade-section">
+        <!-- قسم العرض -->
+        <div class="trade-part">
+          <h4>العرض</h4>
+          <label>نوع العرض:</label>
+          <select id="offerType" onchange="updateOfferValues()">
+            <option value="">اختر نوع العرض</option>
+            <option value="coins">عملات</option>
+            <option value="item">أيتم</option>
+            <option value="bot">بوت</option>
+            <option value="store">من المتجر</option>
+          </select>
+          <label>القيمة:</label>
+          <!-- يتم تعبئته حسب نوع العرض -->
+          <select id="offerValue" style="display:none;">
+            <option value="">اختر القيمة</option>
+          </select>
+          <!-- حقل إدخال العملات -->
+          <input type="number" id="offerCoinsInput" placeholder="عدد العملات" style="display:none;" />
+        </div>
+        <!-- قسم الطلب -->
+        <div class="trade-part">
+          <h4>الطلب</h4>
+          <label>نوع الطلب:</label>
+          <select id="requestType" onchange="updateRequestValues()">
+            <option value="">اختر نوع الطلب</option>
+            <option value="coins">عملات</option>
+            <option value="item">أيتم</option>
+            <option value="bot">بوت</option>
+            <option value="store">من المتجر</option>
+          </select>
+          <label>القيمة:</label>
+          <select id="requestValue" style="display:none;">
+            <option value="">اختر القيمة</option>
+          </select>
+          <input type="number" id="requestCoinsInput" placeholder="عدد العملات" style="display:none;" />
+        </div>
+      </div>
       <button onclick="createTrade()">إرسال الطلب</button>
     </div>
+    
     <div class="trade-requests" id="tradeList">
-      <!-- سيتم عرض طلبات التريد هنا على شكل كروت -->
+      <!-- تُعرض طلبات التريد هنا في كروت أنيقة -->
     </div>
   </div>
+  
   <script>
-    // تعبئة قائمة العناصر التي يعرضها المستخدم من مشترياته
-    function loadUserItems() {
-      const currentUser = localStorage.getItem('currentUser');
-      const users = JSON.parse(localStorage.getItem('users')) || {};
-      let userItems = [];
-      if (users[currentUser] && users[currentUser].purchases) {
-        userItems = users[currentUser].purchases;
+    // دالة لتحديث خيارات العرض بناءً على النوع
+    function updateOfferValues() {
+      const type = document.getElementById('offerType').value;
+      const offerSelect = document.getElementById('offerValue');
+      const offerCoinsInput = document.getElementById('offerCoinsInput');
+      offerSelect.style.display = 'none';
+      offerCoinsInput.style.display = 'none';
+      
+      if(type === 'coins') {
+        offerCoinsInput.style.display = 'block';
+      } else if(type === 'item') {
+        // تعبئة القائمة بأيتمات المستخدم (من مشترياته)
+        const currentUser = localStorage.getItem('currentUser');
+        const users = JSON.parse(localStorage.getItem('users')) || {};
+        let userItems = [];
+        if(users[currentUser] && users[currentUser].purchases){
+          userItems = users[currentUser].purchases;
+        }
+        offerSelect.innerHTML = '';
+        if(userItems.length === 0) {
+          offerSelect.innerHTML = '<option value="">لا توجد أيتمات</option>';
+        } else {
+          userItems.forEach(item => {
+            offerSelect.innerHTML += `<option value="${item.name}">${item.name}</option>`;
+          });
+        }
+        offerSelect.style.display = 'block';
+      } else if(type === 'bot') {
+        // إذا كان المستخدم يمتلك بوت
+        const currentUser = localStorage.getItem('currentUser');
+        const users = JSON.parse(localStorage.getItem('users')) || {};
+        offerSelect.innerHTML = '';
+        if(users[currentUser] && users[currentUser].boughtBot){
+          offerSelect.innerHTML = '<option value="bot">بوت</option>';
+        } else {
+          offerSelect.innerHTML = '<option value="">لا تمتلك بوت</option>';
+        }
+        offerSelect.style.display = 'block';
+      } else if(type === 'store') {
+        // قائمة من المتجر (الأصناف الموجودة في global items)
+        const items = JSON.parse(localStorage.getItem('items')) || [];
+        offerSelect.innerHTML = '';
+        if(items.length === 0) {
+          offerSelect.innerHTML = '<option value="">لا توجد أيتمات في المتجر</option>';
+        } else {
+          items.forEach(item => {
+            offerSelect.innerHTML += `<option value="${item.name}">${item.name} (${item.rarity})</option>`;
+          });
+        }
+        offerSelect.style.display = 'block';
       }
-      const offerSelect = document.getElementById('offerItem');
-      offerSelect.innerHTML = '';
-      if(userItems.length === 0) {
-        offerSelect.innerHTML = '<option value="">لا توجد أيتمات في مشترياتك</option>';
-      } else {
-        userItems.forEach((item) => {
-          offerSelect.innerHTML += `<option value="${item.name}">${item.name}</option>`;
-        });
-      }
-      // إضافة خيار للعرض بالعملات إذا رغب المستخدم
-      offerSelect.innerHTML += `<option value="coins">عملات</option>`;
     }
-    // تعبئة قائمة العناصر المطلوبة من المخزون العام للأيتيمات
-    function loadGlobalItems() {
-      const items = JSON.parse(localStorage.getItem('items')) || [];
-      const requestSelect = document.getElementById('requestItem');
-      requestSelect.innerHTML = '';
-      if(items.length === 0) {
-        requestSelect.innerHTML = '<option value="">لا توجد أيتمات متاحة</option>';
-      } else {
-        items.forEach((item) => {
-          requestSelect.innerHTML += `<option value="${item.name}">${item.name} (${item.rarity})</option>`;
-        });
+    
+    // دالة لتحديث خيارات الطلب بناءً على النوع
+    function updateRequestValues() {
+      const type = document.getElementById('requestType').value;
+      const requestSelect = document.getElementById('requestValue');
+      const requestCoinsInput = document.getElementById('requestCoinsInput');
+      requestSelect.style.display = 'none';
+      requestCoinsInput.style.display = 'none';
+      
+      if(type === 'coins') {
+        requestCoinsInput.style.display = 'block';
+      } else if(type === 'item') {
+        // نستخدم قائمة global items لعرض أيتمات الطلب
+        const items = JSON.parse(localStorage.getItem('items')) || [];
+        requestSelect.innerHTML = '';
+        if(items.length === 0) {
+          requestSelect.innerHTML = '<option value="">لا توجد أيتمات</option>';
+        } else {
+          items.forEach(item => {
+            requestSelect.innerHTML += `<option value="${item.name}">${item.name} (${item.rarity})</option>`;
+          });
+        }
+        requestSelect.style.display = 'block';
+      } else if(type === 'bot') {
+        // عرض خيار البوت
+        requestSelect.innerHTML = '<option value="bot">بوت</option>';
+        requestSelect.style.display = 'block';
+      } else if(type === 'store') {
+        // عرض قائمة من المتجر
+        const items = JSON.parse(localStorage.getItem('items')) || [];
+        requestSelect.innerHTML = '';
+        if(items.length === 0) {
+          requestSelect.innerHTML = '<option value="">لا توجد أيتمات في المتجر</option>';
+        } else {
+          items.forEach(item => {
+            requestSelect.innerHTML += `<option value="${item.name}">${item.name} (${item.rarity})</option>`;
+          });
+        }
+        requestSelect.style.display = 'block';
       }
-      // إضافة خيار للطلب بالعملات
-      requestSelect.innerHTML += `<option value="coins">عملات</option>`;
     }
+    
     function createTrade() {
       const recipient = document.getElementById('tradeRecipient').value.trim();
-      const offer = document.getElementById('offerItem').value;
-      const request = document.getElementById('requestItem').value;
+      const offerType = document.getElementById('offerType').value;
+      const requestType = document.getElementById('requestType').value;
+      let offerValue, requestValue;
+      
+      if(offerType === "coins"){
+        offerValue = document.getElementById('offerCoinsInput').value;
+        if(!offerValue) {
+          alert("يرجى إدخال عدد العملات للعرض");
+          return;
+        }
+      } else {
+        offerValue = document.getElementById('offerValue').value;
+      }
+      
+      if(requestType === "coins"){
+        requestValue = document.getElementById('requestCoinsInput').value;
+        if(!requestValue) {
+          alert("يرجى إدخال عدد العملات للطلب");
+          return;
+        }
+      } else {
+        requestValue = document.getElementById('requestValue').value;
+      }
+      
       const sender = localStorage.getItem('currentUser');
       if (!sender) {
         alert('يجب تسجيل الدخول!');
         return;
       }
-      if (!recipient || !offer || !request) {
+      if (!recipient || !offerType || !offerValue || !requestType || !requestValue) {
         alert('يرجى ملء جميع الحقول');
         return;
       }
+      
       let trades = JSON.parse(localStorage.getItem('tradeRequests')) || [];
       const trade = {
         sender,
         recipient,
-        offer,
-        request,
+        offer: { type: offerType, value: offerValue },
+        request: { type: requestType, value: requestValue },
         time: new Date().toLocaleString()
       };
       trades.push(trade);
@@ -173,6 +311,7 @@
       alert('تم إرسال طلب التريد');
       document.getElementById('tradeRecipient').value = '';
     }
+    
     function displayTrades() {
       const tradeList = document.getElementById('tradeList');
       tradeList.innerHTML = '';
@@ -183,15 +322,17 @@
         card.innerHTML = `
           <p><strong>المرسل:</strong> ${trade.sender}</p>
           <p><strong>المستقبل:</strong> ${trade.recipient}</p>
-          <p><strong>يعرض:</strong> ${trade.offer} ${trade.offer === 'coins' ? '(عملات)' : ''}</p>
-          <p><strong>يطلب:</strong> ${trade.request} ${trade.request === 'coins' ? '(عملات)' : ''}</p>
+          <p><strong>يعرض:</strong> ${trade.offer.value} (${trade.offer.type})</p>
+          <p><strong>يطلب:</strong> ${trade.request.value} (${trade.request.type})</p>
           <p><small>${trade.time}</small></p>
         `;
         tradeList.appendChild(card);
       });
     }
-    loadUserItems();
-    loadGlobalItems();
+    
+    // تحميل القوائم عند تحميل الصفحة
+    updateOfferValues();
+    updateRequestValues();
     displayTrades();
   </script>
 </body>
