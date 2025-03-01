@@ -6,7 +6,7 @@
   <title>لوحة التحكم</title>
   <link rel="stylesheet" href="dashboard-styles.css">
   <style>
-    /* التصميم الأساسي مع خلفية داكنة */
+    /* خلفية داكنة وتصميم عصري */
     body {
       background: #121212;
       font-family: 'Segoe UI', sans-serif;
@@ -25,7 +25,7 @@
     .header .coins {
       font-size: 18px;
     }
-    /* زر دخول/خروج وضع الأدمن */
+    /* زر دخول/خروج وضع الأدمن: مربع أحمر متوسط الحجم في منتصف أعلى الصفحة */
     #adminToggleBtn {
       position: absolute;
       top: 10px;
@@ -38,10 +38,10 @@
       padding: 10px 20px;
       font-size: 18px;
       cursor: pointer;
-      display: none; /* يظهر فقط إذا كان المستخدم أدمن */
       z-index: 1000;
+      display: none;
     }
-    /* تحسين الشات */
+    /* الشات */
     .chat-container {
       display: flex;
       flex-direction: column;
@@ -113,7 +113,7 @@
     .game-area h2 {
       margin-top: 0;
     }
-    /* التصميم الاستجابي */
+    /* استجابة */
     @media screen and (max-width: 768px) {
       .header {
         flex-direction: column;
@@ -130,7 +130,7 @@
   </style>
 </head>
 <body>
-  <!-- زر دخول/خروج وضع الأدمن -->
+  <!-- زر دخول/خروج وضع الأدمن يظهر فقط إذا كان المستخدم أدمن -->
   <button id="adminToggleBtn"></button>
   
   <div class="header">
@@ -150,7 +150,7 @@
     </div>
   </div>
   
-  <!-- أزرار تنقل رئيسية بتأثير 6D -->
+  <!-- أزرار تنقل بتأثير 6D -->
   <div style="text-align:center; margin:10px;">
     <a href="shop.html" class="button-6d">المتجر</a>
     <a href="items.html" class="button-6d">تجميع الأيتيمات</a>
@@ -160,7 +160,7 @@
   <section class="game-area">
     <h2>منطقة الألعاب</h2>
     <button id="collect-coins" onclick="collectCoins()" class="button-6d">تجميع العملات</button>
-    <p id="coin-count">رصيدك: 0 عملة</p>
+    <p id="coinCount">رصيدك: 0 عملة</p>
     <div style="margin-top:10px;">
       <a href="shop.html" class="button-6d">اذهب إلى المتجر</a>
     </div>
@@ -169,13 +169,13 @@
   <script src="chat.js"></script>
   <script src="script.js"></script>
   <script>
-    // عند تحميل الصفحة، تحقق مما إذا كان المستخدم أدمن وعرض الزر المناسب
     document.addEventListener("DOMContentLoaded", function() {
       const currentUser = localStorage.getItem('currentUser');
       const users = JSON.parse(localStorage.getItem('users')) || {};
       const adminBtn = document.getElementById('adminToggleBtn');
       if (users[currentUser] && users[currentUser].isAdmin) {
         adminBtn.style.display = 'block';
+        // إذا كنا في صفحة الأدمن، يظهر الزر كـ "خروج من وضع الأدمن"
         if (window.location.href.indexOf('admin.html') !== -1) {
           adminBtn.textContent = 'خروج من وضع الأدمن';
           adminBtn.onclick = function() {
