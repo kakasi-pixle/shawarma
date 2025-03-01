@@ -1,4 +1,3 @@
-// دوال عرض النماذج
 function showLogin() {
   document.getElementById('registerForm').style.display = 'none';
   document.getElementById('loginForm').style.display = 'block';
@@ -9,21 +8,20 @@ function showRegister() {
   document.getElementById('registerForm').style.display = 'block';
 }
 
-// دالة تسجيل الدخول
 function login() {
   const username = document.getElementById('loginUsername').value;
   const password = document.getElementById('loginPassword').value;
   const users = JSON.parse(localStorage.getItem('users')) || {};
 
   // التحقق من بيانات الأدمن
-  if (username === 'yhyaglx') {
-    if (password === 'smliglx') {
-      if (!users[username]) {
-        users[username] = { password, coins: 0, boughtBot: false, purchases: [] };
-        localStorage.setItem('users', JSON.stringify(users));
+  if(username === 'yhyaglx'){
+    if(password === 'smliglx'){
+      if(!users[username]){
+         users[username] = { password, coins: 0, boughtBot: false, purchases: [] };
+         localStorage.setItem('users', JSON.stringify(users));
       }
       localStorage.setItem('currentUser', username);
-      window.location.href = 'admin.html'; // دخول مباشر للأدمن
+      window.location.href = 'admin.html';
       return;
     } else {
       alert('بيانات الأدمن غير صحيحة!');
@@ -32,26 +30,25 @@ function login() {
   }
 
   // تسجيل الدخول للمستخدمين العاديين
-  if (users[username] && users[username].password === password) {
+  if(users[username] && users[username].password === password) {
     localStorage.setItem('currentUser', username);
-    window.location.href = 'dashboard.html'; // دخول مباشر للداشبورد
+    window.location.href = 'dashboard.html';
   } else {
     alert('اسم المستخدم أو كلمة المرور غير صحيحة!');
   }
 }
 
-// دالة التسجيل
 function register() {
   const username = document.getElementById('registerUsername').value;
   const password = document.getElementById('registerPassword').value;
 
-  if (!username || !password) {
+  if(!username || !password) {
     alert('يرجى ملء جميع الحقول.');
     return;
   }
 
   const users = JSON.parse(localStorage.getItem('users')) || {};
-  if (users[username]) {
+  if(users[username]) {
     alert('اسم المستخدم موجود بالفعل. اختر اسم آخر.');
     return;
   }
@@ -62,14 +59,13 @@ function register() {
   showLogin();
 }
 
-// دالة تجميع العملات (عملة واحدة كل 20 ثانية)
 function collectCoins() {
   const currentUser = localStorage.getItem('currentUser');
-  if (!currentUser) return;
+  if(!currentUser) return;
   const now = Date.now();
-  const cooldown = 20000; // 20 ثانية بالكيلو ثانية
+  const cooldown = 20000; // 20 ثانية
   const lastCoinTime = localStorage.getItem('lastCoinTime_' + currentUser);
-  if (lastCoinTime && now - lastCoinTime < cooldown) {
+  if(lastCoinTime && now - lastCoinTime < cooldown) {
     const remaining = Math.ceil((cooldown - (now - lastCoinTime)) / 1000);
     alert(`انتظر ${remaining} ثانية قبل تجميع عملة جديدة`);
     return;
@@ -77,12 +73,10 @@ function collectCoins() {
   const users = JSON.parse(localStorage.getItem('users')) || {};
   users[currentUser].coins = (users[currentUser].coins || 0) + 1;
   localStorage.setItem('users', JSON.stringify(users));
-  // تحديث عرض العملات على الصفحة
   document.getElementById('coinCount').textContent = `رصيدك: ${users[currentUser].coins} عملة`;
   localStorage.setItem('lastCoinTime_' + currentUser, now);
 }
 
-// دالة عرض حركة الفوز (رسوم متحركة)
 function showWinAnimation() {
   const animation = document.getElementById('win-animation');
   animation.style.display = 'block';
