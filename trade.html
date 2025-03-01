@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>نظام تريد متقدم</title>
+  <title>نظام تريد متقدم - تبادل الأصول</title>
   <link rel="stylesheet" href="dashboard-styles.css">
   <style>
     body {
@@ -96,6 +96,7 @@
       width: 300px;
       box-shadow: 0 2px 8px rgba(0,0,0,0.5);
       transition: transform 0.2s ease;
+      position: relative;
     }
     .trade-card:hover {
       transform: scale(1.05);
@@ -109,6 +110,22 @@
     }
     .trade-card p small {
       color: #aaa;
+    }
+    .trade-card .action-btn {
+      padding: 6px 12px;
+      font-size: 14px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      margin: 5px 2px 0 2px;
+    }
+    .accept-btn {
+      background: #28a745;
+      color: #fff;
+    }
+    .decline-btn {
+      background: #dc3545;
+      color: #fff;
     }
   </style>
 </head>
@@ -133,11 +150,9 @@
             <option value="store">من المتجر</option>
           </select>
           <label>القيمة:</label>
-          <!-- يتم تعبئته حسب نوع العرض -->
           <select id="offerValue" style="display:none;">
             <option value="">اختر القيمة</option>
           </select>
-          <!-- حقل إدخال العملات -->
           <input type="number" id="offerCoinsInput" placeholder="عدد العملات" style="display:none;" />
         </div>
         <!-- قسم الطلب -->
@@ -167,6 +182,12 @@
   </div>
   
   <script>
+    // تحديث آخر نشاط للمستخدم (تحديث timestamp)
+    const currentUser = localStorage.getItem('currentUser');
+    if (currentUser) {
+      localStorage.setItem("lastActive_" + currentUser, Date.now());
+    }
+
     // دالة لتحديث خيارات العرض بناءً على النوع
     function updateOfferValues() {
       const type = document.getElementById('offerType').value;
@@ -179,7 +200,6 @@
         offerCoinsInput.style.display = 'block';
       } else if(type === 'item') {
         // تعبئة القائمة بأيتمات المستخدم (من مشترياته)
-        const currentUser = localStorage.getItem('currentUser');
         const users = JSON.parse(localStorage.getItem('users')) || {};
         let userItems = [];
         if(users[currentUser] && users[currentUser].purchases){
@@ -195,8 +215,7 @@
         }
         offerSelect.style.display = 'block';
       } else if(type === 'bot') {
-        // إذا كان المستخدم يمتلك بوت
-        const currentUser = localStorage.getItem('currentUser');
+        // عرض خيار البوت إذا كان موجود
         const users = JSON.parse(localStorage.getItem('users')) || {};
         offerSelect.innerHTML = '';
         if(users[currentUser] && users[currentUser].boughtBot){
@@ -231,7 +250,7 @@
       if(type === 'coins') {
         requestCoinsInput.style.display = 'block';
       } else if(type === 'item') {
-        // نستخدم قائمة global items لعرض أيتمات الطلب
+        // استخدام قائمة global items لعرض أيتمات الطلب
         const items = JSON.parse(localStorage.getItem('items')) || [];
         requestSelect.innerHTML = '';
         if(items.length === 0) {
@@ -243,11 +262,9 @@
         }
         requestSelect.style.display = 'block';
       } else if(type === 'bot') {
-        // عرض خيار البوت
         requestSelect.innerHTML = '<option value="bot">بوت</option>';
         requestSelect.style.display = 'block';
       } else if(type === 'store') {
-        // عرض قائمة من المتجر
         const items = JSON.parse(localStorage.getItem('items')) || [];
         requestSelect.innerHTML = '';
         if(items.length === 0) {
@@ -261,6 +278,7 @@
       }
     }
     
+    // إنشاء طلب التريد مع حفظه في localStorage
     function createTrade() {
       const recipient = document.getElementById('tradeRecipient').value.trim();
       const offerType = document.getElementById('offerType').value;
@@ -287,7 +305,7 @@
         requestValue = document.getElementById('requestValue').value;
       }
       
-      const sender = localStorage.getItem('currentUser');
+      const sender = currentUser;
       if (!sender) {
         alert('يجب تسجيل الدخول!');
         return;
@@ -312,11 +330,24 @@
       document.getElementById('tradeRecipient').value = '';
     }
     
+    // دالة لتنظيف الطلبات القديمة (أكثر من ساعة)
+    function clearOldTrades() {
+      let trades = JSON.parse(localStorage.getItem('tradeRequests')) || [];
+      const now = Date.now();
+      trades = trades.filter(trade => {
+        const tradeTime = new Date(trade.time).getTime();
+        return now - tradeTime < 3600000; // أقل من ساعة
+      });
+      localStorage.setItem('tradeRequests', JSON.stringify(trades));
+    }
+    
+    // دالة لعرض طلبات التريد في كروت أنيقة مع أزرار قبول ورفض للمتلقي (إذا كان المستخدم الحالي هو المستقبل)
     function displayTrades() {
+      clearOldTrades();
       const tradeList = document.getElementById('tradeList');
       tradeList.innerHTML = '';
       const trades = JSON.parse(localStorage.getItem('tradeRequests')) || [];
-      trades.forEach(trade => {
+      trades.forEach((trade, index) => {
         const card = document.createElement('div');
         card.className = 'trade-card';
         card.innerHTML = `
@@ -326,11 +357,115 @@
           <p><strong>يطلب:</strong> ${trade.request.value} (${trade.request.type})</p>
           <p><small>${trade.time}</small></p>
         `;
+        // إذا كان المستخدم الحالي هو المستقبل، أضف أزرار قبول ورفض
+        if(trade.recipient === currentUser) {
+          const acceptBtn = document.createElement('button');
+          acceptBtn.className = 'action-btn accept-btn';
+          acceptBtn.textContent = 'قبول الطلب';
+          acceptBtn.onclick = () => acceptTrade(index);
+          
+          const declineBtn = document.createElement('button');
+          declineBtn.className = 'action-btn decline-btn';
+          declineBtn.textContent = 'رفض الطلب';
+          declineBtn.onclick = () => declineTrade(index);
+          
+          card.appendChild(acceptBtn);
+          card.appendChild(declineBtn);
+        }
         tradeList.appendChild(card);
       });
     }
     
-    // تحميل القوائم عند تحميل الصفحة
+    // دالة لقبول الطلب وتنفيذ التبادل بين الطرفين
+    function acceptTrade(index) {
+      let trades = JSON.parse(localStorage.getItem('tradeRequests')) || [];
+      const trade = trades[index];
+      if(trade.recipient !== currentUser) {
+        alert("ليس لديك صلاحية قبول هذا الطلب");
+        return;
+      }
+      // جلب بيانات المستخدمين
+      const users = JSON.parse(localStorage.getItem('users')) || {};
+      const senderUser = users[trade.sender];
+      const recipientUser = users[trade.recipient];
+      
+      // دوال مساعدة لمعالجة التبادل
+      function transferCoins(fromUser, toUser, amount) {
+        amount = parseInt(amount);
+        if(fromUser.coins < amount) return false;
+        fromUser.coins -= amount;
+        toUser.coins += amount;
+        return true;
+      }
+      function transferItem(fromUser, toUser, itemName) {
+        if(!fromUser.purchases) return false;
+        const index = fromUser.purchases.findIndex(i => i.name === itemName);
+        if(index === -1) return false;
+        const item = fromUser.purchases.splice(index, 1)[0];
+        if(!toUser.purchases) toUser.purchases = [];
+        toUser.purchases.push(item);
+        return true;
+      }
+      function transferBot(fromUser, toUser) {
+        if(!fromUser.boughtBot) return false;
+        fromUser.boughtBot = false;
+        toUser.boughtBot = true;
+        return true;
+      }
+      
+      let success = false;
+      // تنفيذ التبادل بناءً على أنواع العرض والطلب
+      // المثال: إذا كان العرض عملات والطلب أيتم
+      if(trade.offer.type === "coins" && trade.request.type === "item") {
+        if(transferCoins(senderUser, recipientUser, trade.offer.value) && transferItem(recipientUser, senderUser, trade.request.value)) {
+          success = true;
+        }
+      } else if(trade.offer.type === "item" && trade.request.type === "coins") {
+        if(transferItem(senderUser, recipientUser, trade.offer.value) && transferCoins(recipientUser, senderUser, trade.request.value)) {
+          success = true;
+        }
+      } else if(trade.offer.type === trade.request.type && trade.offer.type === "coins") {
+        // تبادل العملات (ربما مجرد تحويل دون تغيير)
+        // هنا نقوم بتبديل العملات بين الطرفين إذا كانت المبالغ متساوية
+        if(trade.offer.value === trade.request.value) {
+          success = true;
+        }
+      } else if(trade.offer.type === "item" && trade.request.type === "item") {
+        if(transferItem(senderUser, recipientUser, trade.offer.value) && transferItem(recipientUser, senderUser, trade.request.value)) {
+          success = true;
+        }
+      } else if(trade.offer.type === "bot" && trade.request.type === "bot") {
+        if(transferBot(senderUser, recipientUser) && transferBot(recipientUser, senderUser)) {
+          success = true;
+        }
+      }
+      // يمكن إضافة حالات تبادل أخرى حسب الحاجة
+      
+      if(success) {
+        localStorage.setItem('users', JSON.stringify(users));
+        // إزالة الطلب من القائمة
+        trades.splice(index, 1);
+        localStorage.setItem('tradeRequests', JSON.stringify(trades));
+        displayTrades();
+        alert("تم قبول الطلب وتنفيذ التبادل بنجاح");
+      } else {
+        alert("فشل تنفيذ التبادل؛ تأكد من توافر الأصول لدى الطرفين");
+      }
+    }
+    
+    // دالة لرفض الطلب (حذف الطلب)
+    function declineTrade(index) {
+      let trades = JSON.parse(localStorage.getItem('tradeRequests')) || [];
+      trades.splice(index, 1);
+      localStorage.setItem('tradeRequests', JSON.stringify(trades));
+      displayTrades();
+      alert("تم رفض الطلب");
+    }
+    
+    // تشغيل تنظيف الطلبات القديمة تلقائيًا كل ساعة
+    setInterval(clearOldTrades, 3600000);
+    
+    // عند تحميل الصفحة
     updateOfferValues();
     updateRequestValues();
     displayTrades();
