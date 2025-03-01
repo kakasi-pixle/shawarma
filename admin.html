@@ -129,7 +129,8 @@
       box-shadow: 0 1px 3px rgba(0,0,0,0.3);
     }
     .form-section input, 
-    .form-section select {
+    .form-section select, 
+    .form-section textarea {
       width: 100%;
       padding: 6px;
       margin: 6px 0;
@@ -178,6 +179,7 @@
         <h1>لوحة التحكم</h1>
         <button onclick="logout()">تسجيل الخروج</button>
       </div>
+      <!-- تبويب إدارة المستخدمين -->
       <div id="usersTab" class="tab active">
         <h2>إدارة المستخدمين</h2>
         <table id="usersTable">
@@ -192,10 +194,11 @@
             </tr>
           </thead>
           <tbody>
-            <!-- بيانات المستخدمين ستُحمَّل هنا -->
+            <!-- بيانات المستخدمين تُحمَّل هنا -->
           </tbody>
         </table>
       </div>
+      <!-- تبويب إضافة أيتمات -->
       <div id="addItemTab" class="tab">
         <h2>إضافة أيتم جديد</h2>
         <div class="form-section">
@@ -209,6 +212,7 @@
           <button onclick="addItem()">إضافة الأيتيم</button>
         </div>
       </div>
+      <!-- تبويب منح صلاحيات الأدمن -->
       <div id="grantAdminTab" class="tab">
         <h2>منح صلاحيات الأدمن</h2>
         <div class="form-section">
@@ -220,28 +224,32 @@
           <button onclick="grantAdmin()">تنفيذ</button>
         </div>
       </div>
+      <!-- تبويب الأخبار والإعلانات -->
       <div id="newsTab" class="tab">
         <h2>أخبار وإعلانات</h2>
-        <div class="news-section">
-          <p>تابع آخر الأخبار والتحديثات على النظام.</p>
-          <ul>
-            <li>تحديث جديد لنظام التريد مع مميزات مبتكرة.</li>
-            <li>فعالية خاصة في المتجر: خصومات وعروض حصرية.</li>
-            <li>إعلان: سيتم إطلاق فعاليات جديدة قريباً.</li>
-          </ul>
+        <div class="form-section">
+          <textarea id="newsContent" style="height:150px;" placeholder="أدخل الأخبار والإعلانات هنا..."></textarea>
+          <button onclick="saveNews()">حفظ الأخبار</button>
         </div>
       </div>
     </div>
   </div>
+  
   <script>
+    // التبديل بين التبويبات
     function showTab(tabId) {
       const tabs = document.querySelectorAll('.tab');
       tabs.forEach(tab => tab.classList.remove('active'));
       document.getElementById(tabId).classList.add('active');
-      if(tabId === 'usersTab'){
+      if (tabId === 'usersTab') {
         loadUsers();
       }
+      if (tabId === 'newsTab') {
+        loadNews();
+      }
     }
+    
+    // تحميل بيانات المستخدمين من localStorage وعرضها
     function loadUsers() {
       const users = JSON.parse(localStorage.getItem('users')) || {};
       const tbody = document.querySelector('#usersTable tbody');
@@ -270,9 +278,11 @@
         `;
       }
     }
+    
+    // حفظ التعديلات على بيانات المستخدم
     function saveUser(username) {
       const users = JSON.parse(localStorage.getItem('users')) || {};
-      if(users[username]){
+      if (users[username]) {
         const newPass = document.getElementById('pass_' + username).value;
         const newCoins = parseInt(document.getElementById('coins_' + username).value);
         const newBot = document.getElementById('bot_' + username).value === 'true';
@@ -286,11 +296,13 @@
         loadUsers();
       }
     }
+    
+    // دالة لإضافة أيتم جديد
     function addItem() {
       const name = document.getElementById('itemName').value.trim();
       const image = document.getElementById('itemImage').value.trim();
       const rarity = document.getElementById('itemRarity').value;
-      if(!name || !image){
+      if (!name || !image) {
         alert('يرجى ملء جميع الحقول');
         return;
       }
@@ -301,11 +313,13 @@
       document.getElementById('itemName').value = '';
       document.getElementById('itemImage').value = '';
     }
+    
+    // دالة لمنح صلاحيات الأدمن
     function grantAdmin() {
       const username = document.getElementById('grantUsername').value.trim();
       const status = document.getElementById('grantStatus').value === 'true';
       const users = JSON.parse(localStorage.getItem('users')) || {};
-      if(users[username]){
+      if (users[username]) {
         users[username].isAdmin = status;
         localStorage.setItem('users', JSON.stringify(users));
         alert('تم تعديل صلاحيات المستخدم ' + username);
@@ -314,20 +328,30 @@
         alert('المستخدم غير موجود');
       }
     }
+    
+    // دالة لتسجيل الخروج
     function logout() {
       localStorage.removeItem('currentUser');
       window.location.href = 'index.html';
     }
+    
+    // دوال الأخبار والإعلانات
+    function loadNews() {
+      let news = localStorage.getItem('news');
+      if (!news) {
+        news = "لا توجد أخبار حالياً.";
+      }
+      document.getElementById('newsContent').value = news;
+    }
+    
+    function saveNews() {
+      const newsText = document.getElementById('newsContent').value;
+      localStorage.setItem('news', newsText);
+      alert("تم حفظ الأخبار والإعلانات");
+    }
+    
     window.onload = function() {
       loadUsers();
-    }
-    // إعداد زر تبديل وضع الأدمن في صفحة الأدمن
-    const adminBtn = document.getElementById('adminToggleBtn');
-    if(adminBtn) {
-      adminBtn.textContent = 'خروج من وضع الأدمن';
-      adminBtn.onclick = function() {
-        window.location.href = 'dashboard.html';
-      }
     }
   </script>
 </body>
