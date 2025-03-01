@@ -1,10 +1,20 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ar">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>تسجيل الدخول</title>
   <link rel="stylesheet" href="login-styles.css">
+  <script>
+    // إذا كان المستخدم مسجلاً بالفعل، إعادة التوجيه مباشرة إلى الداشبورد
+    if (localStorage.getItem('currentUser')) {
+      window.history.pushState(null, null, window.location.href);
+      window.onpopstate = function() {
+        window.history.pushState(null, null, window.location.href);
+      };
+      window.location.href = 'dashboard.html';
+    }
+  </script>
 </head>
 <body>
   <canvas id="snow"></canvas>
@@ -13,7 +23,7 @@
       <h2>Login</h2>
       <form id="loginForm">
         <div class="input-group">
-          <input type="text" id="loginUsername" placeholder="Username" required>
+          <input type="text" id="loginUsername" placeholder="Username (استخدم admin للأدمن)" required>
         </div>
         <div class="input-group">
           <input type="password" id="loginPassword" placeholder="Password" required>
