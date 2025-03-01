@@ -48,28 +48,32 @@
   </style>
 </head>
 <body>
-  <!-- قسم الفعاليات (الجديد) -->
+  <!-- قسم الفعاليات (القسم الجديد) -->
   <div class="shop-section">
     <h2>قسم الفعاليات</h2>
     <div class="shop-items">
       <div class="shop-item">
         <h3>سيف خشبي</h3>
         <p>السعر: 10 عملة</p>
+        <p>القوة: 10<br>المتانة: 100</p>
         <button onclick="buyEventItem('سيف خشبي', 10)">شراء</button>
       </div>
       <div class="shop-item">
         <h3>سيف صخري</h3>
         <p>السعر: 15 عملة</p>
+        <p>القوة: 15<br>المتانة: 150</p>
         <button onclick="buyEventItem('سيف صخري', 15)">شراء</button>
       </div>
       <div class="shop-item">
         <h3>سيف حديدي</h3>
         <p>السعر: 20 عملة</p>
+        <p>القوة: 20<br>المتانة: 200</p>
         <button onclick="buyEventItem('سيف حديدي', 20)">شراء</button>
       </div>
       <div class="shop-item">
         <h3>سيف ناري</h3>
         <p>السعر: 30 عملة</p>
+        <p>القوة: 30<br>المتانة: 300</p>
         <button onclick="buyEventItem('سيف ناري', 30)">شراء</button>
       </div>
       <div class="shop-item">
@@ -126,41 +130,46 @@
       const users = JSON.parse(localStorage.getItem('users')) || {};
       const currentUser = localStorage.getItem('currentUser');
       if (!currentUser) {
-        alert('يجب تسجيل الدخول أولاً!');
-        return;
+          alert('يجب تسجيل الدخول أولاً!');
+          return;
       }
-      if (users[currentUser].coins >= cost) {
-        users[currentUser].coins -= cost;
-        if (!users[currentUser].purchases) {
-          users[currentUser].purchases = [];
-        }
-        users[currentUser].purchases.push({ name: itemName, boughtAt: new Date().toLocaleString() });
-        localStorage.setItem('users', JSON.stringify(users));
-        alert('تم شراء ' + itemName);
+      if(users[currentUser].coins >= cost){
+          users[currentUser].coins -= cost;
+          if(!users[currentUser].purchases){
+             users[currentUser].purchases = [];
+          }
+          users[currentUser].purchases.push({ name: itemName, boughtAt: new Date().toLocaleString() });
+          localStorage.setItem('users', JSON.stringify(users));
+          alert('تم شراء ' + itemName);
       } else {
-        alert('ليس لديك عملات كافية!');
+          alert('ليس لديك عملات كافية!');
       }
     }
     
     function buyEventItem(itemName, cost) {
-      // نفس وظيفة الشراء ولكن للقسم الجديد
       const users = JSON.parse(localStorage.getItem('users')) || {};
       const currentUser = localStorage.getItem('currentUser');
       if (!currentUser) {
-        alert('يجب تسجيل الدخول أولاً!');
-        return;
+          alert('يجب تسجيل الدخول أولاً!');
+          return;
       }
-      if (users[currentUser].coins >= cost) {
-        users[currentUser].coins -= cost;
-        if (!users[currentUser].purchases) {
-          users[currentUser].purchases = [];
-        }
-        users[currentUser].purchases.push({ name: itemName, boughtAt: new Date().toLocaleString() });
-        localStorage.setItem('users', JSON.stringify(users));
-        alert('تم شراء ' + itemName);
-      } else {
-        alert('ليس لديك عملات كافية!');
+      if(users[currentUser].coins < cost){
+          alert('ليس لديك عملات كافية!');
+          return;
       }
+      users[currentUser].coins -= cost;
+      if(!users[currentUser].purchases){
+         users[currentUser].purchases = [];
+      }
+      let purchaseItem = { name: itemName, boughtAt: new Date().toLocaleString() };
+      // إذا كان العنصر سيف، نضيف خصائص القوة والمتانة
+      if(itemName.indexOf("سيف") !== -1) {
+        purchaseItem.power = cost;             // القوة حسب السعر
+        purchaseItem.durability = cost * 10;     // المتانة تساوي السعر * 10
+      }
+      users[currentUser].purchases.push(purchaseItem);
+      localStorage.setItem('users', JSON.stringify(users));
+      alert('تم شراء ' + itemName);
     }
   </script>
 </body>
