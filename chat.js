@@ -1,3 +1,4 @@
+// التأكد من تسجيل الدخول
 const currentUser = localStorage.getItem('currentUser');
 if (!currentUser) {
   window.location.href = 'index.html';
@@ -5,63 +6,36 @@ if (!currentUser) {
 
 const users = JSON.parse(localStorage.getItem('users')) || {};
 const chatBox = document.getElementById('chatBox');
+const messageInput = document.getElementById('messageInput');
 const coinCount = document.getElementById('coinCount');
 let messages = JSON.parse(localStorage.getItem('messages')) || [];
 
+// تحديث عرض العملات
 function updateCoins() {
   coinCount.textContent = `Coins: ${users[currentUser].coins}`;
 }
 
-function sendMessage() {
-  const messageInput = document.getElementById('messageInput');
-  const message = messageInput.value.trim();
+// عرض الرسائل في الشات
+function renderMessages() {
+  chatBox.innerHTML = '';
+  messages.forEach(msg => {
+    const div = document.createElement('div');
+    div.className = 'chat-message';
+    div.textContent = `${msg.sender}: ${msg.text}`;
+    chatBox.appendChild(div);
+  });
+}
 
-  if (message) {
-    messages.push({ sender: currentUser, text: message });
+// إرسال رسالة جديدة
+function sendMessage() {
+  const text = messageInput.value.trim();
+  if (text !== '') {
+    messages.push({ sender: currentUser, text });
     localStorage.setItem('messages', JSON.stringify(messages));
     renderMessages();
     messageInput.value = '';
   }
 }
 
-function sendCoin() {
-  if (users[currentUser].coins > 0) {
-    messages.push({ sender: currentUser, text: '🎉 Sent a coin!' });
-    users[currentUser].coins--;
-    localStorage.setItem('users', JSON.stringify(users));
-    localStorage.setItem('messages', JSON.stringify(messages));
-    updateCoins();
-    renderMessages();
-  } else {
-    alert('You don’t have enough coins!');
-  }
-}
-
-function renderMessages() {
-  chatBox.innerHTML = '';
-  messages.forEach(msg => {
-    const div = document.createElement('div');
-    div.textContent = `${msg.sender}: ${msg.text}`;
-    chatBox.appendChild(div);
-  });
-}
-
 updateCoins();
 renderMessages();
-
-// Donations and emoji effects
-function handleDonation(amount) {
-  let message = '';
-  if (amount === 5) {
-      message = '🎉 تأثير بسيط 🎉';
-  } else if (amount === 10) {
-      message = '🎊 تأثير متوسط 🎊';
-  } else if (amount === 20) {
-      message = '🎆 تأثير مميز 🎆';
-  } else if (amount === 30) {
-      message = '✨✨ أقوى تأثير ✨✨';
-  }
-  alert(message);
-}
-
-// تمت إزالة وظيفة شراء البوت من الشات حسب الطلب
