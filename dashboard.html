@@ -2,113 +2,181 @@
 <html lang="ar">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>لوحة التحكم</title>
   <link rel="stylesheet" href="dashboard-styles.css">
   <style>
-    /* أزرار 4D */
-    .button-4d {
-      background: linear-gradient(145deg, #ffffff, #d1d1d1);
+    /* خلفية داكنة وتصميم عصري للداشبورد */
+    body {
+      background: #121212;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      color: #f1f1f1;
+      margin: 0;
+      padding: 0;
+    }
+    .header {
+      background: #1f1f1f;
+      padding: 15px;
+      text-align: right;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .header .coins {
+      font-size: 18px;
+    }
+    /* تحسين الشات */
+    .chat-container {
+      display: flex;
+      flex-direction: column;
+      height: calc(100vh - 150px);
+      margin: 10px;
+      background: #1e1e1e;
+      border-radius: 8px;
+      overflow: hidden;
+    }
+    .chat-box {
+      flex: 1;
+      padding: 15px;
+      overflow-y: auto;
+      background: #292929;
+    }
+    .chat-message {
+      margin: 5px 0;
+      padding: 8px;
+      background: #333;
+      border-radius: 4px;
+    }
+    .chat-input {
+      display: flex;
+      padding: 10px;
+      background: #1f1f1f;
+    }
+    .chat-input input {
+      flex: 1;
+      padding: 10px;
+      border: none;
+      border-radius: 4px;
+      margin-right: 8px;
+      font-size: 16px;
+    }
+    .chat-input button {
+      padding: 10px 20px;
+      border: none;
+      border-radius: 4px;
+      background: #0066cc;
+      color: #fff;
+      cursor: pointer;
+      font-size: 16px;
+    }
+    /* أزرار 6D - تأثير 3D مميز */
+    .button-6d {
+      background: linear-gradient(145deg, #e0e0e0, #aaaaaa);
       border: none;
       border-radius: 12px;
-      box-shadow: 4px 4px 8px #aaa, -4px -4px 8px #fff;
-      padding: 10px 20px;
+      box-shadow: 6px 6px 12px #0e0e0e, -6px -6px 12px #ffffff;
+      padding: 12px 24px;
       font-size: 18px;
-      transition: transform 0.1s;
-      margin: 5px;
       text-decoration: none;
       color: #333;
+      margin: 5px;
+      transition: transform 0.1s;
+      display: inline-block;
     }
-    .button-4d:active {
+    .button-6d:active {
       transform: translateY(4px);
     }
-    /* قسم الأخبار والفعاليات */
-    .news-section {
-      background: #fff;
-      color: #333;
-      border-radius: 10px;
-      padding: 20px;
+    /* قسم منطقة الألعاب مع رابط للمتجر داخلها */
+    .game-area {
+      text-align: center;
       margin: 20px;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+      padding: 20px;
+      background: #1f1f1f;
+      border-radius: 8px;
     }
-    .news-section h3 {
+    .game-area h2 {
       margin-top: 0;
     }
-    .links-section {
-      margin-top: 20px;
-      text-align: center;
-    }
-    .links-section a {
-      display: inline-block;
-      margin: 5px;
-      text-decoration: none;
-      color: #ff6a00;
-      font-weight: bold;
+    /* زر سري للأدمن */
+    .secret-btn {
+      background: #ff5722;
+      border: none;
+      border-radius: 50%;
+      width: 45px;
+      height: 45px;
+      color: #fff;
+      font-size: 20px;
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      display: none;
+      cursor: pointer;
+      box-shadow: 4px 4px 8px rgba(0,0,0,0.4);
     }
   </style>
 </head>
 <body>
   <div class="header">
-    <button class="icon-btn" onclick="showInfo()">
-      <img src="computer-icon.png" alt="Computer Icon">
-    </button>
-    <div class="coins">
-      <span id="coinCount">Coins: 0</span>
+    <div>
+      <button class="icon-btn" onclick="showInfo()">
+        <img src="computer-icon.png" alt="Computer Icon" style="width:30px;">
+      </button>
+      <span class="coins" id="coinCount">Coins: 0</span>
     </div>
-    <script>
-      const currentUser = localStorage.getItem('currentUser');
-      const users = JSON.parse(localStorage.getItem('users')) || {};
-      if (users[currentUser] && users[currentUser].isAdmin) {
-        document.write('<img src="settings-icon.png" alt="Settings" class="settings-icon" onclick="toggleAdminMode()">');
-      }
-    </script>
+    <div>
+      <!-- زر الإعدادات يظهر فقط للأدمن -->
+      <script>
+        const currentUser = localStorage.getItem('currentUser');
+        const users = JSON.parse(localStorage.getItem('users')) || {};
+        if (users[currentUser] && users[currentUser].isAdmin) {
+          document.write('<img src="settings-icon.png" alt="Settings" class="settings-icon" onclick="toggleAdminMode()" style="width:30px; cursor:pointer;">');
+        }
+      </script>
+    </div>
   </div>
+  
   <div class="chat-container">
     <div id="chatBox" class="chat-box"></div>
     <div class="chat-input">
       <input type="text" id="messageInput" placeholder="اكتب رسالتك...">
       <button onclick="sendMessage()">إرسال</button>
-      <button onclick="sendCoin()">إرسال عملة</button>
     </div>
   </div>
   
-  <!-- أزرار تنقل إضافية مع تأثير 4D -->
+  <!-- أزرار تنقل بتأثير 6D -->
   <div style="text-align:center; margin:10px;">
-    <a href="shop.html" class="button-4d">المتجر</a>
-    <a href="items.html" class="button-4d">تجميع الأيتيمات</a>
-    <a href="trade.html" class="button-4d">نظام تريد</a>
+    <a href="shop.html" class="button-6d">المتجر</a>
+    <a href="items.html" class="button-6d">تجميع الأيتيمات</a>
+    <a href="trade.html" class="button-6d">نظام تريد</a>
   </div>
   
-  <!-- قسم الألعاب والأخبار والفعاليات -->
-  <section id="game-area" class="game-area">
+  <section class="game-area">
     <h2>منطقة الألعاب</h2>
-    <button id="collect-coins" onclick="collectCoins()">تجميع العملات</button>
+    <button id="collect-coins" onclick="collectCoins()" class="button-6d">تجميع العملات</button>
     <p id="coin-count">رصيدك: 0 عملة</p>
     <div style="margin-top:10px;">
-      <a href="shop.html" class="button-4d">اذهب إلى المتجر</a>
+      <a href="shop.html" class="button-6d">اذهب إلى المتجر</a>
     </div>
-    <div id="win-animation" style="display: none;">🎉💰</div>
   </section>
   
   <!-- قسم الأخبار والفعاليات -->
-  <div class="news-section">
+  <div class="news-section" style="background:#1f1f1f; color:#f1f1f; margin:20px; padding:20px; border-radius:8px; box-shadow: 0 2px 6px rgba(0,0,0,0.4);">
     <h3>أخبار وفعاليات</h3>
-    <p>تابع آخر الأخبار والفعاليات والعروض الخاصة على منصتنا.</p>
-    <ul>
-      <li>فعالية الأسبوع: خصومات مذهلة في المتجر</li>
-      <li>تحديث جديد لنظام التريد مع مميزات مبتكرة</li>
-      <li>فعالية الألعاب: تحديات وجوائز قيمة</li>
+    <ul style="list-style:none; padding:0;">
+      <li>فعالية الأسبوع: خصومات مذهلة!</li>
+      <li>تحديث جديد لنظام التريد مع ميزات مبتكرة.</li>
+      <li>فعاليات الألعاب: تحديات وجوائز قيمة.</li>
     </ul>
   </div>
   
   <!-- روابط إضافية -->
-  <div class="links-section">
-    <a href="https://whatsapp.com/channel/0029VaxKNWwKgsO0vINyGg1W" target="_blank">رابط المطور</a>
-    <a href="#">صفحة الدعم الفني</a>
-    <a href="#">سياسة الاستخدام</a>
+  <div style="text-align:center; margin:20px;">
+    <a href="https://whatsapp.com/channel/0029VaxKNWwKgsO0vINyGg1W" target="_blank" class="button-6d">رابط المطور</a>
+    <a href="#" class="button-6d">صفحة الدعم الفني</a>
+    <a href="#" class="button-6d">سياسة الاستخدام</a>
   </div>
   
-  <!-- زر سري في وضع الأدمن -->
+  <!-- زر سري يظهر في وضع الأدمن -->
   <button class="secret-btn" id="adminSecretBtn" onclick="openAdminPanel()">⚙️</button>
   
   <script src="chat.js"></script>
